@@ -3,6 +3,7 @@
 Все настройки загружаются из переменных окружения или .env файла.
 """
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings
 
 
@@ -30,6 +31,20 @@ class Settings(BaseSettings):
     # JWT-настройки
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 дней — срок жизни токена
     ALGORITHM: str = "HS256"
+
+    @model_validator(mode="after")
+    def _fix_database_url(self) -> "Settings":
+        """Neon/Vercel даёт postgresql://, а SQLAlchemy async нужен postgresql+asyncpg://.
+        Также asyncpg не понимает sslmode — заменяем на ssl."""
+        url = self.DATABASE_URL
+        if url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgresql://") and "+asyncpg" not in url:
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # asyncpg использует параметр ssl вместо sslmode
+        url = url.replace("sslmode=", "ssl=")
+        self.DATABASE_URL = url
+        return self
 
     class Config:
         env_file = ".env"
