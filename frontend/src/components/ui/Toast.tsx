@@ -24,13 +24,13 @@ const toastVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { type: 'spring', damping: 22, stiffness: 320 },
+    transition: { type: 'spring' as const, damping: 22, stiffness: 320 },
   },
   exit: {
     opacity: 0,
     y: -16,
     scale: 0.96,
-    transition: { duration: 0.18, ease: [0.4, 0, 1, 1] },
+    transition: { duration: 0.18, ease: [0.4, 0, 1, 1] as const },
   },
 };
 

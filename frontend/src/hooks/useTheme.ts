@@ -28,7 +28,7 @@ export const useTheme = () => {
 
     // Обновляем meta theme-color для системного UI (статус-бар и т.д.)
     const bgColor =
-      themeParams?.bg_color || (isDark ? '#1a1a2e' : '#ffffff');
+      (themeParams as Record<string, string> | undefined)?.bg_color || (isDark ? '#1a1a2e' : '#ffffff');
 
     let metaTag = document.querySelector<HTMLMetaElement>(
       'meta[name="theme-color"]',

@@ -1,4 +1,4 @@
-import { User } from './index';
+import type { User } from './index';
 
 // --- Базовые типы ответов API ---
 
