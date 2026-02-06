@@ -1,0 +1,187 @@
+.page {
+  padding: var(--space-xl);
+  padding-bottom: 120px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2xl);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.titleIcon {
+  color: var(--color-accent);
+}
+
+.plans {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-2xl);
+}
+
+.planCard {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-xl) var(--space-md);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.planCardSelected {
+  border-color: var(--color-accent);
+}
+
+.popularBadge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px var(--space-sm);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent, #fff);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.planLessons {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.planLessonsLabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.planPrice {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-top: var(--space-sm);
+}
+
+.planPerLesson {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+
+.checkMark {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section {
+  margin-bottom: var(--space-2xl);
+}
+
+.promoRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.promoIcon {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.promoInput {
+  flex: 1;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.promoInput::placeholder {
+  color: var(--color-text-secondary);
+  opacity: 0.6;
+}
+
+.promoButton {
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.totalRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) 0;
+  border-top: 1px solid var(--color-border);
+  margin-bottom: var(--space-xl);
+}
+
+.totalLabel {
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--color-text-secondary);
+}
+
+.totalValue {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.actions {
+  position: fixed;
+  bottom: 80px;
+  left: var(--space-xl);
+  right: var(--space-xl);
+}
+
+.payButton {
+  width: 100%;
+  padding: var(--space-lg);
+  background: var(--color-accent);
+  color: var(--color-text-on-accent, #fff);
+  border: none;
+  border-radius: var(--radius-lg);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}

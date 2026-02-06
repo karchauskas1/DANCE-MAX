@@ -1,0 +1,131 @@
+.page {
+  padding: var(--space-xl);
+  padding-bottom: 120px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-3xl) 0;
+  border-bottom: 3px solid var(--color-accent);
+  margin-bottom: var(--space-2xl);
+  text-align: center;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.section {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sectionIcon {
+  color: var(--color-accent);
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.teacherList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.teacherCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.teacherAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+  flex-shrink: 0;
+}
+
+.teacherInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.teacherName {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.teacherExp {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.lessonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.lessonCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.lessonInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lessonTitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.lessonTime {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.lessonSpots {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}

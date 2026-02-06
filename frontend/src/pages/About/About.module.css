@@ -1,0 +1,140 @@
+.page {
+  padding: var(--space-xl);
+  padding-bottom: 120px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-2xl) 0;
+  text-align: center;
+}
+
+.headerIcon {
+  color: var(--color-accent);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.studioName {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--color-accent);
+}
+
+.section {
+  margin-bottom: var(--space-3xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.sectionIcon {
+  color: var(--color-accent);
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+.infoText {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+}
+
+.mapPlaceholder {
+  width: 100%;
+  height: 160px;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  color: var(--color-text-secondary);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.mapIcon {
+  color: var(--color-accent);
+  opacity: 0.5;
+}
+
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.contactRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+}
+
+.contactIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.contactValue {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.hoursList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.hoursRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-surface);
+}
+
+.hoursDays {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.hoursTime {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}

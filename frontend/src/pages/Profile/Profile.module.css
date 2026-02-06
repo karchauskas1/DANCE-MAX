@@ -1,0 +1,146 @@
+.page {
+  padding: var(--space-xl);
+  padding-bottom: 120px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-2xl) 0;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-full);
+  background: var(--color-border);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.balanceCard {
+  padding: var(--space-xl);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-secondary, #ff6b9d));
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+.balanceHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.balanceIcon {
+  color: var(--color-text-on-accent, #fff);
+  opacity: 0.8;
+}
+
+.balanceLabel {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text-on-accent, #fff);
+  opacity: 0.8;
+}
+
+.balanceValue {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-on-accent, #fff);
+}
+
+.section {
+  margin-bottom: var(--space-2xl);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--space-lg);
+}
+
+.subscriptionCard {
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.subscriptionName {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.subscriptionLeft {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.progressBar {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: var(--space-xs);
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: var(--radius-full);
+  transition: width 0.3s ease;
+}
+
+.linkList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.linkItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--color-surface);
+  text-decoration: none;
+  color: inherit;
+}
+
+.linkIcon {
+  color: var(--color-accent);
+  flex-shrink: 0;
+}
+
+.linkLabel {
+  flex: 1;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.linkArrow {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}

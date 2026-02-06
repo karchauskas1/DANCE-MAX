@@ -1,0 +1,158 @@
+/* ============================================
+   Toast — Notification banner
+   ============================================ */
+
+.container {
+  position: fixed;
+  top: var(--space-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-toast);
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 420px;
+  padding: 0 var(--space-lg);
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  width: 100%;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--color-border);
+  pointer-events: auto;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-text);
+  box-shadow:
+    var(--shadow-lg),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+/* ── Type variants ── */
+
+.success {
+  background: rgba(var(--color-success-rgb), 0.12);
+  border-color: rgba(var(--color-success-rgb), 0.2);
+}
+
+.error {
+  background: rgba(var(--color-error-rgb), 0.12);
+  border-color: rgba(var(--color-error-rgb), 0.2);
+}
+
+.info {
+  background: var(--color-surface-elevated);
+  border-color: var(--color-border);
+}
+
+/* ── Icon ── */
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.success .icon {
+  color: var(--color-success);
+}
+
+.error .icon {
+  color: var(--color-error);
+}
+
+.info .icon {
+  color: var(--color-primary);
+}
+
+/* ── Message ── */
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Close ── */
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.closeButton:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.closeButton svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ── Progress bar (auto-dismiss) ── */
+
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  animation: toastProgress 3s linear forwards;
+}
+
+.success .progress {
+  background: var(--color-success);
+}
+
+.error .progress {
+  background: var(--color-error);
+}
+
+.info .progress {
+  background: var(--color-primary);
+}
+
+@keyframes toastProgress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .progress {
+    animation: none;
+    width: 0%;
+  }
+}

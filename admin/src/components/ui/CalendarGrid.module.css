@@ -1,0 +1,149 @@
+.grid {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* -- Header -- */
+.header {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-md) 0;
+  gap: 2px;
+}
+
+.dayHeaderToday .dayName {
+  color: var(--color-primary);
+}
+
+.dayName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dayNumber {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-text);
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.dayNumberToday {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* -- Body -- */
+.body {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+  max-height: 640px;
+  overflow-y: auto;
+}
+
+/* -- Time column -- */
+.timeCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeLabel {
+  height: 60px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--space-xs);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* -- Day column -- */
+.dayColumn {
+  position: relative;
+  border-left: 1px solid var(--color-border);
+}
+
+.dayColumnToday {
+  background: rgba(var(--color-primary-rgb), 0.02);
+}
+
+.hourCell {
+  height: 60px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hourCell:last-child {
+  border-bottom: none;
+}
+
+/* -- Lesson block -- */
+.lessonBlock {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-xs) var(--space-sm);
+  background: color-mix(in srgb, var(--lesson-color) 12%, transparent);
+  border-left: 3px solid var(--lesson-color);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+  transition: background var(--transition-fast);
+  z-index: 1;
+}
+
+.lessonBlock:hover {
+  background: color-mix(in srgb, var(--lesson-color) 20%, transparent);
+}
+
+.lessonTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lessonMeta {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--color-text-secondary);
+}
+
+.lessonTeacher {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lessonCount {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}

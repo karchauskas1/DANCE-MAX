@@ -1,0 +1,142 @@
+/* ============================================
+   Input — Text field with floating label
+   ============================================ */
+
+.wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* ── The input ── */
+
+.input {
+  width: 100%;
+  height: 52px;
+  padding: 20px 16px 6px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition:
+    border-color var(--transition-normal),
+    box-shadow var(--transition-normal),
+    background-color var(--transition-normal);
+  caret-color: var(--color-primary);
+}
+
+.input::placeholder {
+  color: transparent;
+}
+
+.input:focus {
+  border-color: var(--color-primary);
+  background: var(--color-surface-elevated);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.1);
+}
+
+/* ── With icon ── */
+
+.hasIcon .input {
+  padding-left: 44px;
+}
+
+.iconSlot {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transition: color var(--transition-normal);
+}
+
+.iconSlot svg {
+  width: 18px;
+  height: 18px;
+}
+
+.field:focus-within .iconSlot {
+  color: var(--color-primary);
+}
+
+/* ── Floating label ── */
+
+.label {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--color-text-muted);
+  pointer-events: none;
+  transform-origin: left center;
+  transition:
+    transform var(--transition-normal) var(--ease-out),
+    font-size var(--transition-normal) var(--ease-out),
+    color var(--transition-normal);
+}
+
+.hasIcon .label {
+  left: 44px;
+}
+
+/* Float up when focused or has value */
+.input:focus ~ .label,
+.filled ~ .label {
+  transform: translateY(-135%) scale(0.75);
+  color: var(--color-text-secondary);
+}
+
+.input:focus ~ .label {
+  color: var(--color-primary);
+}
+
+/* ── Error state ── */
+
+.inputError {
+  border-color: var(--color-error) !important;
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 3px rgba(var(--color-error-rgb), 0.1) !important;
+}
+
+.errorText {
+  margin-top: var(--space-xs);
+  padding-left: var(--space-lg);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-error);
+  line-height: 1.4;
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: none;
+  }
+
+  .input {
+    transition: none;
+  }
+}

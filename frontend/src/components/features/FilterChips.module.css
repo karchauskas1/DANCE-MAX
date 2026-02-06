@@ -1,0 +1,91 @@
+/* ============================================
+   FilterChips -- Horizontal scrollable pills
+   ============================================ */
+
+.wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 var(--space-xl);
+}
+
+.wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.track {
+  display: flex;
+  gap: var(--space-sm);
+  padding: var(--space-xs) 0 var(--space-md);
+}
+
+/* ── Chip button ── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  padding: 8px 18px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.chip:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.chip:active {
+  transform: scale(0.95);
+  transition-duration: 80ms;
+}
+
+/* ── Selected state ── */
+
+.selected {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 12px rgba(var(--color-primary-rgb), 0.3);
+}
+
+.selected:hover {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  color: #fff;
+  border-color: transparent;
+}
+
+/* ── Reduced motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .chip:active {
+    transform: none;
+    transition: none;
+  }
+}

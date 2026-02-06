@@ -1,0 +1,96 @@
+/* ============================================
+   BottomNav -- Fixed bottom navigation bar
+   ============================================ */
+
+.nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 430px;
+  margin: 0 auto;
+  background: rgba(var(--color-primary-rgb), 0) /* transparent base */;
+  background-color: rgba(10, 10, 12, 0.92);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-md) var(--space-xl);
+  padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom, 8px));
+  z-index: var(--z-nav);
+}
+
+/* ── Nav item ── */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-body);
+  padding: 0;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iconWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+
+/* ── Active state ── */
+
+.active {
+  color: var(--color-primary);
+}
+
+/* ── Inactive state ── */
+
+.inactive {
+  color: var(--color-text-muted);
+}
+
+.inactive:hover {
+  color: var(--color-text-secondary);
+}
+
+/* ── Sliding indicator bar ── */
+
+.indicator {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.5);
+}
+
+/* ── Light theme override ── */
+
+[data-theme='light'] .nav {
+  background-color: rgba(250, 250, 250, 0.92);
+}

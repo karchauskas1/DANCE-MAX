@@ -1,0 +1,229 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+.date {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* -- Stats grid -- */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-lg);
+}
+
+/* -- Main grid -- */
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-lg);
+}
+
+/* -- Card shared -- */
+.chartCard,
+.scheduleCard,
+.bookingsCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: -0.2px;
+}
+
+.cardSubtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.linkBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-primary);
+  transition: opacity var(--transition-fast);
+  cursor: pointer;
+}
+
+.linkBtn:hover {
+  opacity: 0.8;
+}
+
+/* -- Chart -- */
+.chartWrap {
+  padding: var(--space-xl);
+}
+
+/* -- Today lessons -- */
+.lessonsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.lessonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+}
+
+.lessonRow:last-child {
+  border-bottom: none;
+}
+
+.lessonRow:hover {
+  background: var(--color-surface-hover);
+}
+
+.lessonColor {
+  width: 4px;
+  height: 32px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.lessonTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.lessonInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.lessonDirection {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lessonTeacher {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.lessonStudents {
+  flex-shrink: 0;
+}
+
+.studentsNormal {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.studentsFull {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-error);
+}
+
+/* -- Bookings table -- */
+.bookingsTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bookingsTable thead th {
+  text-align: left;
+  padding: var(--space-md) var(--space-xl);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bookingsTable tbody td {
+  padding: var(--space-md) var(--space-xl);
+  font-size: 14px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.bookingsTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.bookingsTable tbody tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.bookingStudent {
+  font-weight: 500;
+}
+
+/* -- Badges -- */
+.badge {
+  display: inline-flex;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.badge_active {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.badge_cancelled {
+  color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+.badge_attended {
+  color: var(--color-info);
+  background: var(--color-info-light);
+}

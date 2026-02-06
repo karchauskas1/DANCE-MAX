@@ -1,0 +1,206 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2xl);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+.count {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+/* -- Student cell -- */
+.studentCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.studentAvatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.studentName {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.studentUsername {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.balanceZero {
+  color: var(--color-error);
+  font-weight: 600;
+}
+
+.balanceNormal {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* -- Actions -- */
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.actionBtn:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+/* -- Modal -- */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  z-index: var(--z-modal);
+  background: var(--color-surface);
+  border-radius: var(--radius-xl);
+  width: 440px;
+  box-shadow: var(--shadow-modal);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xl);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.modalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.modalClose:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.modalBody {
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.currentBalance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.balanceLabel {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.balanceValue {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-xl);
+  border-top: 1px solid var(--color-border);
+}
+
+.cancelBtn {
+  height: 38px;
+  padding: 0 var(--space-xl);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.submitBtn {
+  height: 38px;
+  padding: 0 var(--space-xl);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: var(--color-primary-dark);
+}
