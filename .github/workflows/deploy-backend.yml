@@ -17,6 +17,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set git identity
+        run: |
+          git config user.email "karchauskas7889@gmail.com"
+          git config user.name "karchauskas1"
+          git commit --allow-empty --author="karchauskas1 <karchauskas7889@gmail.com>" -m "deploy"
+
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh && echo "$HOME/.local/bin" >> $GITHUB_PATH
 
