@@ -62,11 +62,11 @@ export default function Lesson() {
   const formattedDate = format(new Date(lesson.date), 'd MMMM, EEEE', { locale: ru });
 
   const handleBook = () => {
-    createBooking.mutate(lesson.id);
+    createBooking.mutate({ lessonId: lesson.id });
   };
 
   const handleCancel = () => {
-    cancelBooking.mutate(lesson.id);
+    cancelBooking.mutate({ bookingId: lesson.id });
   };
 
   return (

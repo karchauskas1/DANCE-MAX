@@ -26,14 +26,14 @@ export interface DirectionDetail {
 }
 
 /** Fetch a single direction by slug together with its upcoming lessons. */
-export function useDirection(slug: string) {
+export function useDirection(slug: string | undefined) {
   return useQuery<DirectionDetail>({
-    queryKey: queryKeys.directions.detail(slug),
+    queryKey: queryKeys.directions.detail(slug!),
     queryFn: async () => {
       const data = await apiClient.get<{
         direction: unknown;
         upcoming_lessons: unknown[];
-      }>(`/api/directions/${slug}`);
+      }>(`/api/directions/${slug!}`);
       return {
         direction: mapDirection(data.direction),
         upcomingLessons: data.upcoming_lessons.map(mapLesson),

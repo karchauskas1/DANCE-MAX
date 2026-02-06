@@ -26,14 +26,14 @@ export interface TeacherDetail {
 }
 
 /** Fetch a single teacher by slug together with their schedule. */
-export function useTeacher(slug: string) {
+export function useTeacher(slug: string | undefined) {
   return useQuery<TeacherDetail>({
-    queryKey: queryKeys.teachers.detail(slug),
+    queryKey: queryKeys.teachers.detail(slug!),
     queryFn: async () => {
       const data = await apiClient.get<{
         teacher: unknown;
         schedule: unknown[];
-      }>(`/api/teachers/${slug}`);
+      }>(`/api/teachers/${slug!}`);
       return {
         teacher: mapTeacher(data.teacher),
         schedule: data.schedule.map(mapLesson),

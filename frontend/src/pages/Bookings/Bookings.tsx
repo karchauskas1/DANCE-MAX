@@ -41,7 +41,7 @@ export default function Bookings() {
   const isLoading = activeTab === 'upcoming' ? isLoadingUpcoming : isLoadingPast;
 
   const handleCancel = (bookingId: number) => {
-    cancelBooking.mutate(bookingId);
+    cancelBooking.mutate({ bookingId });
   };
 
   return (
@@ -127,7 +127,7 @@ export default function Bookings() {
                   disabled={cancelBooking.isPending}
                 >
                   {cancelBooking.isPending &&
-                  cancelBooking.variables === booking.id
+                  cancelBooking.variables?.bookingId === booking.id
                     ? 'Отмена...'
                     : 'Отменить'}
                 </button>

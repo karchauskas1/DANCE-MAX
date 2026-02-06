@@ -20,11 +20,11 @@ export function useCourses() {
 }
 
 /** Fetch a single special course by ID. */
-export function useCourse(id: number) {
+export function useCourse(id: number | undefined) {
   return useQuery<SpecialCourse>({
-    queryKey: queryKeys.courses.detail(id),
+    queryKey: queryKeys.courses.detail(id!),
     queryFn: async () => {
-      const data = await apiClient.get<unknown>(`/api/courses/${id}`);
+      const data = await apiClient.get<unknown>(`/api/courses/${id!}`);
       return mapCourse(data);
     },
     enabled: !!id,

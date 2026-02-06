@@ -49,7 +49,7 @@ export function useTodayLessons() {
 /** Fetch lessons with optional filters (date, direction, teacher, level). */
 export function useLessons(params: LessonsParams = {}) {
   return useQuery<Lesson[]>({
-    queryKey: queryKeys.lessons.list(params),
+    queryKey: queryKeys.lessons.list(params as Record<string, unknown>),
     queryFn: async () => {
       const qs = buildLessonsQueryString(params);
       const data = await apiClient.get<unknown[]>(`/api/lessons${qs}`);

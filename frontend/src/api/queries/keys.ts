@@ -10,7 +10,7 @@ export const queryKeys = {
   lessons: {
     all: ['lessons'] as const,
     today: () => ['lessons', 'today'] as const,
-    list: (params: Record<string, unknown>) =>
+    list: (params?: Record<string, unknown>) =>
       ['lessons', 'list', params] as const,
     detail: (id: number) => ['lessons', 'detail', id] as const,
   },

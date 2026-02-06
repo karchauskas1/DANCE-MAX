@@ -41,7 +41,7 @@ export default function Profile() {
     : '';
 
   const balance = balanceData?.balance ?? user?.balance ?? 0;
-  const activeSubscriptions = balanceData?.active_subscriptions ?? 0;
+  const activeSubscriptions = balanceData?.activeSubscriptions?.length ?? 0;
 
   return (
     <motion.div
