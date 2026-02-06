@@ -3,7 +3,6 @@ import WebApp from '@twa-dev/sdk';
 import { apiClient } from '../api/client';
 import { useAuthStore } from '../store/auth';
 import type { User } from '../types';
-import type { AuthResponse } from '../types/api';
 
 /** Мок-пользователь для режима разработки (когда нет initData от Telegram) */
 const MOCK_USER: User = {
@@ -15,9 +14,25 @@ const MOCK_USER: User = {
   phone: undefined,
   photoUrl: undefined,
   balance: 0,
+  isAdmin: false,
 };
 
 const MOCK_TOKEN = 'dev-mock-token';
+
+/** Маппинг snake_case ответа бэкенда в camelCase User */
+function mapUserResponse(u: Record<string, unknown>): User {
+  return {
+    id: u.id as number,
+    telegramId: u.telegram_id as number,
+    firstName: u.first_name as string,
+    lastName: (u.last_name as string) || undefined,
+    username: (u.username as string) || undefined,
+    phone: (u.phone as string) || undefined,
+    photoUrl: (u.photo_url as string) || undefined,
+    balance: u.balance as number,
+    isAdmin: (u.is_admin as boolean) || false,
+  };
+}
 
 /**
  * Хук авторизации через Telegram Mini App.
@@ -35,7 +50,6 @@ export const useAuth = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Если уже авторизованы — не повторяем запрос
     if (isAuthenticated) {
       setIsLoading(false);
       return;
@@ -54,7 +68,6 @@ export const useAuth = () => {
           // SDK недоступен вне Telegram
         }
 
-        // Режим разработки: нет initData — используем мок
         if (!initData) {
           console.warn(
             '[useAuth] initData отсутствует — используется мок-пользователь',
@@ -64,13 +77,13 @@ export const useAuth = () => {
           return;
         }
 
-        // Отправляем initData на бэкенд для верификации
-        const response = await apiClient.post<AuthResponse>(
+        // Отправляем init_data (snake_case!) на бэкенд
+        const response = await apiClient.post<{ token: string; user: Record<string, unknown> }>(
           '/api/auth/telegram',
-          { initData },
+          { init_data: initData },
         );
 
-        setAuth(response.user, response.token);
+        setAuth(mapUserResponse(response.user), response.token);
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Ошибка авторизации';

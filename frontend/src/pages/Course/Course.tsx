@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Calendar, User, Clock, CreditCard, CheckCircle } from 'lucide-react';
+import { Calendar, User, Clock, CreditCard } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import Skeleton from '../../components/ui/Skeleton';
+import { useCourse } from '../../api/queries';
 import styles from './Course.module.css';
 
 const containerVariants = {
@@ -16,27 +20,31 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockCourse = {
-  id: '1',
-  title: 'Интенсив по Hip-Hop',
-  description:
-    'Шестидневный интенсив для тех, кто хочет углубить свои знания в Hip-Hop. Разберем продвинутые техники, поработаем над музыкальностью и подготовим номер.',
-  dates: '20-25 января 2025',
-  time: 'Ежедневно, 18:00 - 20:00',
-  teacher: 'Алексей К.',
-  lessons: 6,
-  price: 4500,
-  spotsLeft: 4,
-  includes: [
-    'Видеозаписи всех занятий',
-    'Сертификат об окончании',
-    'Чат с преподавателем',
-  ],
-};
-
 export default function Course() {
   const { id } = useParams<{ id: string }>();
-  const course = { ...mockCourse, id: id || mockCourse.id };
+  const { data: course, isLoading } = useCourse(id ? Number(id) : undefined);
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <Skeleton width="100%" height={180} borderRadius="12px" />
+        <Skeleton width="70%" height={28} />
+        <Skeleton width="100%" height={60} />
+        <Skeleton width="100%" height={40} />
+        <Skeleton width="100%" height={40} />
+        <Skeleton width="100%" height={40} />
+        <Skeleton width="100%" height={40} />
+      </div>
+    );
+  }
+
+  if (!course) {
+    return (
+      <div className={styles.page}>
+        <p>Курс не найден</p>
+      </div>
+    );
+  }
 
   return (
     <motion.div
@@ -50,68 +58,78 @@ export default function Course() {
 
       {/* Title */}
       <motion.h1 className={styles.title} variants={itemVariants}>
-        {course.title}
+        {course.name}
       </motion.h1>
 
       {/* Description */}
-      <motion.p className={styles.description} variants={itemVariants}>
-        {course.description}
-      </motion.p>
+      {course.description && (
+        <motion.p className={styles.description} variants={itemVariants}>
+          {course.description}
+        </motion.p>
+      )}
 
       {/* Info rows */}
       <motion.div className={styles.infoRow} variants={itemVariants}>
         <Calendar size={18} className={styles.infoIcon} />
         <div className={styles.infoContent}>
-          <span className={styles.infoLabel}>Даты</span>
-          <span className={styles.infoValue}>{course.dates}</span>
+          <span className={styles.infoLabel}>Дата старта</span>
+          <span className={styles.infoValue}>
+            {format(new Date(course.startDate), 'd MMMM yyyy', { locale: ru })}
+          </span>
         </div>
       </motion.div>
 
       <motion.div className={styles.infoRow} variants={itemVariants}>
         <Clock size={18} className={styles.infoIcon} />
         <div className={styles.infoContent}>
-          <span className={styles.infoLabel}>Время</span>
-          <span className={styles.infoValue}>{course.time}</span>
+          <span className={styles.infoLabel}>Занятий</span>
+          <span className={styles.infoValue}>{course.lessonsCount}</span>
         </div>
       </motion.div>
 
-      <motion.div className={styles.infoRow} variants={itemVariants}>
-        <User size={18} className={styles.infoIcon} />
-        <div className={styles.infoContent}>
-          <span className={styles.infoLabel}>Преподаватель</span>
-          <span className={styles.infoValue}>{course.teacher}</span>
-        </div>
-      </motion.div>
+      {course.teacher && (
+        <motion.div className={styles.infoRow} variants={itemVariants}>
+          <User size={18} className={styles.infoIcon} />
+          <div className={styles.infoContent}>
+            <span className={styles.infoLabel}>Преподаватель</span>
+            <span className={styles.infoValue}>{course.teacher.name}</span>
+          </div>
+        </motion.div>
+      )}
 
       <motion.div className={styles.infoRow} variants={itemVariants}>
         <CreditCard size={18} className={styles.infoIcon} />
         <div className={styles.infoContent}>
           <span className={styles.infoLabel}>Стоимость</span>
           <span className={styles.infoValue}>
-            {course.price.toLocaleString('ru-RU')} руб. / {course.lessons} занятий
+            {(course.price / 100).toLocaleString('ru-RU')} ₽ / {course.lessonsCount} занятий
           </span>
         </div>
       </motion.div>
 
-      {/* Includes */}
-      <motion.section className={styles.section} variants={itemVariants}>
-        <h2 className={styles.sectionTitle}>Что входит</h2>
-        <ul className={styles.includesList}>
-          {course.includes.map((item) => (
-            <li key={item} className={styles.includesItem}>
-              <CheckCircle size={16} className={styles.checkIcon} />
-              {item}
-            </li>
-          ))}
-        </ul>
-      </motion.section>
+      {course.direction && (
+        <motion.div className={styles.infoRow} variants={itemVariants}>
+          <Calendar size={18} className={styles.infoIcon} />
+          <div className={styles.infoContent}>
+            <span className={styles.infoLabel}>Направление</span>
+            <span className={styles.infoValue}>{course.direction.name}</span>
+          </div>
+        </motion.div>
+      )}
 
       {/* Enroll Button */}
       <motion.div className={styles.actions} variants={itemVariants}>
         <div className={styles.spotsInfo}>
-          Осталось {course.spotsLeft} мест
+          {course.spotsLeft > 0
+            ? `Осталось ${course.spotsLeft} мест`
+            : 'Мест нет'}
         </div>
-        <button className={styles.enrollButton}>Записаться</button>
+        <button
+          className={styles.enrollButton}
+          disabled={course.spotsLeft <= 0}
+        >
+          Записаться
+        </button>
       </motion.div>
     </motion.div>
   );

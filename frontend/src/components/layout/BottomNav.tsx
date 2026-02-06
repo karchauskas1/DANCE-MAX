@@ -33,19 +33,19 @@ export default function BottomNav() {
             to={item.path}
             className={`${styles.item} ${isActive ? styles.active : styles.inactive}`}
           >
+            {isActive && (
+              <motion.span
+                className={styles.indicator}
+                layoutId="bottomNavIndicator"
+                transition={{
+                  type: 'spring',
+                  stiffness: 500,
+                  damping: 35,
+                }}
+              />
+            )}
             <span className={styles.iconWrap}>
               <Icon size={22} strokeWidth={isActive ? 2.2 : 1.8} />
-              {isActive && (
-                <motion.span
-                  className={styles.indicator}
-                  layoutId="bottomNavIndicator"
-                  transition={{
-                    type: 'spring',
-                    stiffness: 500,
-                    damping: 35,
-                  }}
-                />
-              )}
             </span>
             <span className={styles.label}>{item.label}</span>
           </NavLink>

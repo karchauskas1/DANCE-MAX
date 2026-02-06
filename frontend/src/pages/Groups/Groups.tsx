@@ -1,5 +1,10 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Users, Calendar, BarChart3 } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import Skeleton from '../../components/ui/Skeleton';
+import { useCourses } from '../../api/queries';
 import styles from './Groups.module.css';
 
 const containerVariants = {
@@ -15,50 +20,9 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockGroups = [
-  {
-    id: 1,
-    direction: 'Hip-Hop',
-    title: 'Hip-Hop с нуля',
-    schedule: 'Пн, Ср 18:00',
-    teacher: 'Алексей К.',
-    startDate: '1 февраля',
-    spots: 3,
-    level: 'Без опыта',
-  },
-  {
-    id: 2,
-    direction: 'Contemporary',
-    title: 'Contemporary с нуля',
-    schedule: 'Вт, Чт 19:00',
-    teacher: 'Мария С.',
-    startDate: '3 февраля',
-    spots: 5,
-    level: 'Без опыта',
-  },
-  {
-    id: 3,
-    direction: 'Stretching',
-    title: 'Растяжка для начинающих',
-    schedule: 'Пн, Ср, Пт 10:00',
-    teacher: 'Ольга П.',
-    startDate: '5 февраля',
-    spots: 8,
-    level: 'Без опыта',
-  },
-  {
-    id: 4,
-    direction: 'Vogue',
-    title: 'Vogue с нуля',
-    schedule: 'Сб 14:00',
-    teacher: 'Дмитрий В.',
-    startDate: '8 февраля',
-    spots: 2,
-    level: 'Без опыта',
-  },
-];
-
 export default function Groups() {
+  const { data: courses, isLoading } = useCourses();
+
   return (
     <motion.div
       className={styles.page}
@@ -77,34 +41,70 @@ export default function Groups() {
         Опытные преподаватели помогут вам освоить базу и полюбить танцы.
       </motion.p>
 
-      <motion.div
-        className={styles.list}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {mockGroups.map((group) => (
-          <motion.div key={group.id} className={styles.card} variants={itemVariants}>
-            <span className={styles.badge}>{group.direction}</span>
-            <h3 className={styles.cardTitle}>{group.title}</h3>
-            <div className={styles.cardMeta}>
-              <span className={styles.metaItem}>
-                <Calendar size={14} />
-                {group.schedule}
-              </span>
-              <span className={styles.metaItem}>
-                <BarChart3 size={14} />
-                {group.level}
-              </span>
+      {isLoading ? (
+        <div className={styles.list}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className={styles.card}>
+              <Skeleton width="30%" height={20} borderRadius="8px" />
+              <Skeleton width="60%" height={18} />
+              <Skeleton width="80%" height={14} />
+              <Skeleton width="100%" height={14} />
             </div>
-            <div className={styles.cardFooter}>
-              <span className={styles.teacher}>{group.teacher}</span>
-              <span className={styles.spots}>{group.spots} мест</span>
-            </div>
-            <span className={styles.startDate}>Старт: {group.startDate}</span>
-          </motion.div>
-        ))}
-      </motion.div>
+          ))}
+        </div>
+      ) : !courses || courses.length === 0 ? (
+        <motion.div variants={itemVariants}>
+          <p>Нет данных о группах.</p>
+          <Link to="/schedule?level=beginner" style={{ color: 'var(--accent)' }}>
+            Посмотреть расписание для начинающих
+          </Link>
+        </motion.div>
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {courses.map((course) => (
+            <motion.div key={course.id} variants={itemVariants}>
+              <Link
+                to={`/course/${course.id}`}
+                className={styles.card}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                {course.direction && (
+                  <span className={styles.badge}>{course.direction.name}</span>
+                )}
+                <h3 className={styles.cardTitle}>{course.name}</h3>
+                <div className={styles.cardMeta}>
+                  <span className={styles.metaItem}>
+                    <Calendar size={14} />
+                    {format(new Date(course.startDate), 'd MMMM yyyy', { locale: ru })}
+                  </span>
+                  <span className={styles.metaItem}>
+                    <BarChart3 size={14} />
+                    {course.lessonsCount} занятий
+                  </span>
+                </div>
+                <div className={styles.cardFooter}>
+                  {course.teacher && (
+                    <span className={styles.teacher}>{course.teacher.name}</span>
+                  )}
+                  <span className={styles.spots}>
+                    {course.spotsLeft > 0
+                      ? `${course.spotsLeft} мест`
+                      : 'Мест нет'}
+                  </span>
+                </div>
+                <span className={styles.startDate}>
+                  Старт: {format(new Date(course.startDate), 'd MMMM', { locale: ru })}
+                </span>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 }

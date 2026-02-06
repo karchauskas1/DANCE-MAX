@@ -1,6 +1,10 @@
 import { useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Clock, MapPin, Users, BarChart3, User, CalendarCheck } from 'lucide-react';
+import { Clock, MapPin, Users, BarChart3, User, CalendarCheck, X } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { useLessonDetail, useCreateBooking, useCancelBooking } from '../../api/queries';
+import Skeleton from '../../components/ui/Skeleton';
 import styles from './Lesson.module.css';
 
 const containerVariants = {
@@ -16,23 +20,54 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockLesson = {
-  id: '1',
-  direction: 'Hip-Hop',
-  title: 'Hip-Hop Начинающие',
-  date: '17 января, среда',
-  time: '18:00 - 19:30',
-  teacher: { name: 'Алексей К.', photo: '' },
-  room: 'Зал 1',
-  spotsTotal: 15,
-  spotsLeft: 5,
-  level: 'Начинающий',
-  description: 'Изучаем базовые движения и грув. Подходит для тех, кто только начинает свой путь в танцах.',
+const levelLabels: Record<string, string> = {
+  beginner: 'Начинающий',
+  intermediate: 'Средний',
+  advanced: 'Продвинутый',
+  all: 'Все уровни',
 };
 
 export default function Lesson() {
   const { id } = useParams<{ id: string }>();
-  const lesson = { ...mockLesson, id: id || mockLesson.id };
+  const { data: lesson, isLoading, isError } = useLessonDetail(Number(id));
+  const createBooking = useCreateBooking();
+  const cancelBooking = useCancelBooking();
+
+  if (isLoading) {
+    return (
+      <div className={styles.page} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <Skeleton width="80px" height="28px" borderRadius="14px" />
+        <Skeleton width="100%" height="32px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="8px" />
+        <Skeleton width="100%" height="80px" borderRadius="8px" />
+        <Skeleton width="100%" height="48px" borderRadius="24px" />
+      </div>
+    );
+  }
+
+  if (isError || !lesson) {
+    return (
+      <div className={styles.page} style={{ textAlign: 'center', padding: '48px 0' }}>
+        <p style={{ opacity: 0.6 }}>Занятие не найдено</p>
+      </div>
+    );
+  }
+
+  const spotsLeft = lesson.maxSpots - lesson.currentSpots;
+  const isFull = spotsLeft <= 0;
+  const formattedDate = format(new Date(lesson.date), 'd MMMM, EEEE', { locale: ru });
+
+  const handleBook = () => {
+    createBooking.mutate(lesson.id);
+  };
+
+  const handleCancel = () => {
+    cancelBooking.mutate(lesson.id);
+  };
 
   return (
     <motion.div
@@ -43,20 +78,20 @@ export default function Lesson() {
     >
       {/* Direction Badge */}
       <motion.div variants={itemVariants}>
-        <span className={styles.badge}>{lesson.direction}</span>
+        <span className={styles.badge}>{lesson.direction.name}</span>
       </motion.div>
 
       {/* Title */}
       <motion.h1 className={styles.title} variants={itemVariants}>
-        {lesson.title}
+        {lesson.direction.name}
       </motion.h1>
 
       {/* Date & Time */}
       <motion.div className={styles.infoRow} variants={itemVariants}>
         <Clock size={18} className={styles.infoIcon} />
         <div className={styles.infoContent}>
-          <span className={styles.infoLabel}>{lesson.date}</span>
-          <span className={styles.infoValue}>{lesson.time}</span>
+          <span className={styles.infoLabel}>{formattedDate}</span>
+          <span className={styles.infoValue}>{lesson.startTime} - {lesson.endTime}</span>
         </div>
       </motion.div>
 
@@ -84,7 +119,7 @@ export default function Lesson() {
         <div className={styles.infoContent}>
           <span className={styles.infoLabel}>Свободные места</span>
           <span className={styles.infoValue}>
-            {lesson.spotsLeft} из {lesson.spotsTotal}
+            {spotsLeft} из {lesson.maxSpots}
           </span>
         </div>
       </motion.div>
@@ -94,22 +129,45 @@ export default function Lesson() {
         <BarChart3 size={18} className={styles.infoIcon} />
         <div className={styles.infoContent}>
           <span className={styles.infoLabel}>Уровень</span>
-          <span className={styles.infoValue}>{lesson.level}</span>
+          <span className={styles.infoValue}>{levelLabels[lesson.level] || lesson.level}</span>
         </div>
       </motion.div>
 
-      {/* Description */}
-      <motion.div className={styles.section} variants={itemVariants}>
-        <h2 className={styles.sectionTitle}>Описание</h2>
-        <p className={styles.description}>{lesson.description}</p>
-      </motion.div>
+      {/* Cancelled notice */}
+      {lesson.isCancelled && (
+        <motion.div className={styles.section} variants={itemVariants}>
+          <p style={{ color: 'var(--tg-theme-destructive-text-color, #e53935)', fontWeight: 600 }}>
+            Занятие отменено{lesson.cancelReason ? `: ${lesson.cancelReason}` : ''}
+          </p>
+        </motion.div>
+      )}
 
-      {/* Book Button */}
+      {/* Book / Cancel Button */}
       <motion.div className={styles.actions} variants={itemVariants}>
-        <button className={styles.bookButton}>
-          <CalendarCheck size={18} />
-          Записаться
-        </button>
+        {lesson.isBooked ? (
+          <button
+            className={styles.bookButton}
+            onClick={handleCancel}
+            disabled={cancelBooking.isPending}
+            style={{ background: 'var(--tg-theme-destructive-text-color, #e53935)' }}
+          >
+            <X size={18} />
+            {cancelBooking.isPending ? 'Отмена...' : 'Отменить запись'}
+          </button>
+        ) : (
+          <button
+            className={styles.bookButton}
+            onClick={handleBook}
+            disabled={isFull || lesson.isCancelled || createBooking.isPending}
+          >
+            <CalendarCheck size={18} />
+            {createBooking.isPending
+              ? 'Запись...'
+              : isFull
+                ? 'Мест нет'
+                : 'Записаться'}
+          </button>
+        )}
       </motion.div>
     </motion.div>
   );

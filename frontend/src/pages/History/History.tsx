@@ -1,5 +1,9 @@
 import { motion } from 'framer-motion';
-import { Receipt, TrendingUp, TrendingDown } from 'lucide-react';
+import { Receipt, TrendingUp, TrendingDown, RefreshCw, HandCoins } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import { useHistory } from '../../api/queries';
+import type { TransactionType } from '../../types';
 import styles from './History.module.css';
 
 const containerVariants = {
@@ -15,18 +19,58 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockTransactions = [
-  { id: 1, type: 'debit' as const, title: 'Hip-Hop Начинающие', date: '18 янв, 18:00', amount: -1 },
-  { id: 2, type: 'credit' as const, title: 'Пополнение баланса', date: '17 янв, 12:30', amount: 4800 },
-  { id: 3, type: 'debit' as const, title: 'Stretching', date: '16 янв, 10:00', amount: -1 },
-  { id: 4, type: 'debit' as const, title: 'Contemporary', date: '15 янв, 19:00', amount: -1 },
-  { id: 5, type: 'credit' as const, title: 'Абонемент на 8 занятий', date: '10 янв, 14:00', amount: 8 },
-  { id: 6, type: 'debit' as const, title: 'Vogue', date: '9 янв, 20:00', amount: -1 },
-  { id: 7, type: 'debit' as const, title: 'Hip-Hop Продвинутые', date: '8 янв, 18:00', amount: -1 },
-  { id: 8, type: 'credit' as const, title: 'Пополнение баланса', date: '5 янв, 09:00', amount: 2400 },
-];
+const typeIcons: Record<TransactionType, typeof TrendingUp> = {
+  purchase: TrendingUp,
+  deduction: TrendingDown,
+  refund: RefreshCw,
+  manual: HandCoins,
+};
+
+function isCredit(amount: number): boolean {
+  return amount > 0;
+}
 
 export default function History() {
+  const { data: transactions, isLoading, error } = useHistory();
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <h1 className={styles.title}>
+          <Receipt size={24} className={styles.titleIcon} />
+          История операций
+        </h1>
+        <div className={styles.list}>
+          {Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className={styles.row} style={{ opacity: 0.4 }}>
+              <div className={styles.indicator} />
+              <div className={styles.rowInfo}>
+                <span className={styles.rowTitle} style={{ background: 'var(--color-border)', borderRadius: 4, height: 14, width: '60%', display: 'block' }} />
+                <span className={styles.rowDate} style={{ background: 'var(--color-border)', borderRadius: 4, height: 10, width: '30%', display: 'block', marginTop: 4 }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.page}>
+        <h1 className={styles.title}>
+          <Receipt size={24} className={styles.titleIcon} />
+          История операций
+        </h1>
+        <p style={{ color: 'var(--color-error)', textAlign: 'center', marginTop: 'var(--space-2xl)' }}>
+          Ошибка загрузки: {error.message}
+        </p>
+      </div>
+    );
+  }
+
+  const list = transactions ?? [];
+
   return (
     <motion.div
       className={styles.page}
@@ -39,33 +83,42 @@ export default function History() {
         История операций
       </motion.h1>
 
-      <motion.div
-        className={styles.list}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {mockTransactions.map((tx) => (
-          <motion.div key={tx.id} className={styles.row} variants={itemVariants}>
-            <div className={`${styles.indicator} ${tx.type === 'credit' ? styles.indicatorPlus : styles.indicatorMinus}`}>
-              {tx.type === 'credit' ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )}
-            </div>
-            <div className={styles.rowInfo}>
-              <span className={styles.rowTitle}>{tx.title}</span>
-              <span className={styles.rowDate}>{tx.date}</span>
-            </div>
-            <span className={`${styles.rowAmount} ${tx.type === 'credit' ? styles.amountPlus : styles.amountMinus}`}>
-              {tx.type === 'credit' ? '+' : ''}{typeof tx.amount === 'number' && Math.abs(tx.amount) > 1
-                ? `${tx.amount.toLocaleString('ru-RU')} руб.`
-                : `${tx.amount} занятие`}
-            </span>
-          </motion.div>
-        ))}
-      </motion.div>
+      {list.length === 0 ? (
+        <motion.p
+          variants={itemVariants}
+          style={{ color: 'var(--color-text-secondary)', textAlign: 'center', marginTop: 'var(--space-2xl)' }}
+        >
+          Операций пока нет
+        </motion.p>
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {list.map((tx) => {
+            const credit = isCredit(tx.amount);
+            const Icon = typeIcons[tx.type] ?? Receipt;
+            const formattedDate = format(new Date(tx.createdAt), 'd MMM yyyy', { locale: ru });
+
+            return (
+              <motion.div key={tx.id} className={styles.row} variants={itemVariants}>
+                <div className={`${styles.indicator} ${credit ? styles.indicatorPlus : styles.indicatorMinus}`}>
+                  <Icon size={16} />
+                </div>
+                <div className={styles.rowInfo}>
+                  <span className={styles.rowTitle}>{tx.description}</span>
+                  <span className={styles.rowDate}>{formattedDate}</span>
+                </div>
+                <span className={`${styles.rowAmount} ${credit ? styles.amountPlus : styles.amountMinus}`}>
+                  {credit ? '+' : ''}{tx.amount}
+                </span>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      )}
     </motion.div>
   );
 }

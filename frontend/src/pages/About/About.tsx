@@ -15,7 +15,7 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockStudio = {
+const studioInfo = {
   name: 'Dance MAX',
   description:
     'Dance MAX -- это современная танцевальная студия в центре города. Мы предлагаем занятия по самым популярным направлениям для любого уровня подготовки. Наша миссия -- сделать танцы доступными и вдохновить каждого на движение.',
@@ -41,12 +41,12 @@ export default function About() {
       <motion.div className={styles.header} variants={itemVariants}>
         <Heart size={32} className={styles.headerIcon} />
         <h1 className={styles.title}>О студии</h1>
-        <span className={styles.studioName}>{mockStudio.name}</span>
+        <span className={styles.studioName}>{studioInfo.name}</span>
       </motion.div>
 
       {/* Description */}
       <motion.section className={styles.section} variants={itemVariants}>
-        <p className={styles.description}>{mockStudio.description}</p>
+        <p className={styles.description}>{studioInfo.description}</p>
       </motion.section>
 
       {/* Address */}
@@ -55,7 +55,7 @@ export default function About() {
           <MapPin size={18} className={styles.sectionIcon} />
           Адрес
         </h2>
-        <p className={styles.infoText}>{mockStudio.address}</p>
+        <p className={styles.infoText}>{studioInfo.address}</p>
         <div className={styles.mapPlaceholder}>
           <MapPin size={24} className={styles.mapIcon} />
           <span>Карта</span>
@@ -68,11 +68,11 @@ export default function About() {
         <div className={styles.contactList}>
           <div className={styles.contactRow}>
             <Phone size={18} className={styles.contactIcon} />
-            <span className={styles.contactValue}>{mockStudio.phone}</span>
+            <span className={styles.contactValue}>{studioInfo.phone}</span>
           </div>
           <div className={styles.contactRow}>
             <Instagram size={18} className={styles.contactIcon} />
-            <span className={styles.contactValue}>{mockStudio.instagram}</span>
+            <span className={styles.contactValue}>{studioInfo.instagram}</span>
           </div>
         </div>
       </motion.section>
@@ -84,7 +84,7 @@ export default function About() {
           Часы работы
         </h2>
         <div className={styles.hoursList}>
-          {mockStudio.workingHours.map((item) => (
+          {studioInfo.workingHours.map((item) => (
             <div key={item.days} className={styles.hoursRow}>
               <span className={styles.hoursDays}>{item.days}</span>
               <span className={styles.hoursTime}>{item.hours}</span>

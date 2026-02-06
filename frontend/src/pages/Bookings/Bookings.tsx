@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CalendarCheck, Clock, MapPin } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import Skeleton from '../../components/ui/Skeleton';
+import { useMyBookings, useCancelBooking } from '../../api/queries';
 import styles from './Bookings.module.css';
 
 const containerVariants = {
@@ -16,23 +20,29 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockUpcoming = [
-  { id: 1, title: 'Hip-Hop Начинающие', date: '18 января', time: '18:00', room: 'Зал 1', teacher: 'Алексей К.' },
-  { id: 2, title: 'Stretching', date: '19 января', time: '10:00', room: 'Зал 2', teacher: 'Ольга П.' },
-  { id: 3, title: 'Contemporary', date: '20 января', time: '19:00', room: 'Зал 1', teacher: 'Мария С.' },
-];
-
-const mockPast = [
-  { id: 4, title: 'Hip-Hop Начинающие', date: '15 января', time: '18:00', room: 'Зал 1', teacher: 'Алексей К.' },
-  { id: 5, title: 'Vogue', date: '13 января', time: '20:00', room: 'Зал 2', teacher: 'Дмитрий В.' },
-];
-
 type Tab = 'upcoming' | 'past';
 
 export default function Bookings() {
   const [activeTab, setActiveTab] = useState<Tab>('upcoming');
 
-  const lessons = activeTab === 'upcoming' ? mockUpcoming : mockPast;
+  const {
+    data: upcomingBookings,
+    isLoading: isLoadingUpcoming,
+  } = useMyBookings('active');
+
+  const {
+    data: pastBookings,
+    isLoading: isLoadingPast,
+  } = useMyBookings('attended');
+
+  const cancelBooking = useCancelBooking();
+
+  const bookings = activeTab === 'upcoming' ? upcomingBookings : pastBookings;
+  const isLoading = activeTab === 'upcoming' ? isLoadingUpcoming : isLoadingPast;
+
+  const handleCancel = (bookingId: number) => {
+    cancelBooking.mutate(bookingId);
+  };
 
   return (
     <motion.div
@@ -62,34 +72,70 @@ export default function Bookings() {
         </button>
       </motion.div>
 
-      {/* Lesson List */}
-      <motion.div
-        className={styles.list}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        key={activeTab}
-      >
-        {lessons.map((lesson) => (
-          <motion.div key={lesson.id} className={styles.card} variants={itemVariants}>
-            <h3 className={styles.cardTitle}>{lesson.title}</h3>
-            <div className={styles.cardMeta}>
-              <span className={styles.metaItem}>
-                <Clock size={14} />
-                {lesson.date}, {lesson.time}
-              </span>
-              <span className={styles.metaItem}>
-                <MapPin size={14} />
-                {lesson.room}
-              </span>
+      {/* Booking List */}
+      {isLoading ? (
+        <div className={styles.list}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className={styles.card}>
+              <Skeleton width="60%" height={18} />
+              <Skeleton width="80%" height={14} />
+              <Skeleton width="40%" height={14} />
             </div>
-            <span className={styles.cardTeacher}>{lesson.teacher}</span>
-            {activeTab === 'upcoming' && (
-              <button className={styles.cancelButton}>Отменить запись</button>
-            )}
-          </motion.div>
-        ))}
-      </motion.div>
+          ))}
+        </div>
+      ) : !bookings || bookings.length === 0 ? (
+        <motion.p className={styles.empty} variants={itemVariants}>
+          {activeTab === 'upcoming'
+            ? 'Нет предстоящих записей'
+            : 'Нет прошедших записей'}
+        </motion.p>
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          key={activeTab}
+        >
+          {bookings.map((booking) => (
+            <motion.div
+              key={booking.id}
+              className={styles.card}
+              variants={itemVariants}
+            >
+              <h3 className={styles.cardTitle}>
+                {booking.lesson.direction.name}
+              </h3>
+              <div className={styles.cardMeta}>
+                <span className={styles.metaItem}>
+                  <Clock size={14} />
+                  {format(new Date(booking.lesson.date), 'd MMMM', { locale: ru })},{' '}
+                  {booking.lesson.startTime}
+                </span>
+                <span className={styles.metaItem}>
+                  <MapPin size={14} />
+                  {booking.lesson.room}
+                </span>
+              </div>
+              <span className={styles.cardTeacher}>
+                {booking.lesson.teacher.name}
+              </span>
+              {activeTab === 'upcoming' && (
+                <button
+                  className={styles.cancelButton}
+                  onClick={() => handleCancel(booking.id)}
+                  disabled={cancelBooking.isPending}
+                >
+                  {cancelBooking.isPending &&
+                  cancelBooking.variables === booking.id
+                    ? 'Отмена...'
+                    : 'Отменить'}
+                </button>
+              )}
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 }

@@ -1,5 +1,8 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Compass } from 'lucide-react';
+import Skeleton from '../../components/ui/Skeleton';
+import { useDirections } from '../../api/queries';
 import styles from './Directions.module.css';
 
 const containerVariants = {
@@ -15,18 +18,9 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockDirections = [
-  { id: 1, slug: 'hip-hop', name: 'Hip-Hop', lessonsCount: 12, color: '#FF6B6B' },
-  { id: 2, slug: 'contemporary', name: 'Contemporary', lessonsCount: 8, color: '#4ECDC4' },
-  { id: 3, slug: 'stretching', name: 'Stretching', lessonsCount: 10, color: '#FFE66D' },
-  { id: 4, slug: 'vogue', name: 'Vogue', lessonsCount: 6, color: '#A855F7' },
-  { id: 5, slug: 'dancehall', name: 'Dancehall', lessonsCount: 5, color: '#F97316' },
-  { id: 6, slug: 'breaking', name: 'Breaking', lessonsCount: 4, color: '#06B6D4' },
-  { id: 7, slug: 'jazz-funk', name: 'Jazz-Funk', lessonsCount: 7, color: '#EC4899' },
-  { id: 8, slug: 'popping', name: 'Popping', lessonsCount: 3, color: '#84CC16' },
-];
-
 export default function Directions() {
+  const { data: directions, isLoading } = useDirections();
+
   return (
     <motion.div
       className={styles.page}
@@ -39,29 +33,52 @@ export default function Directions() {
         Направления
       </motion.h1>
 
-      <motion.div
-        className={styles.grid}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {mockDirections.map((direction) => (
-          <motion.div
-            key={direction.id}
-            className={styles.card}
-            variants={itemVariants}
-          >
-            <div
-              className={styles.cardAccent}
-              style={{ background: direction.color }}
-            />
-            <h3 className={styles.cardTitle}>{direction.name}</h3>
-            <span className={styles.cardMeta}>
-              {direction.lessonsCount} занятий в неделю
-            </span>
-          </motion.div>
-        ))}
-      </motion.div>
+      {isLoading ? (
+        <div className={styles.grid}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className={styles.card}>
+              <Skeleton width="100%" height={6} borderRadius="6px" />
+              <Skeleton width="60%" height={20} />
+              <Skeleton width="40%" height={14} />
+            </div>
+          ))}
+        </div>
+      ) : !directions || directions.length === 0 ? (
+        <motion.p className={styles.empty} variants={itemVariants}>
+          Нет данных
+        </motion.p>
+      ) : (
+        <motion.div
+          className={styles.grid}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {directions.map((direction) => (
+            <motion.div
+              key={direction.id}
+              variants={itemVariants}
+            >
+              <Link
+                to={`/direction/${direction.slug}`}
+                className={styles.card}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                <div
+                  className={styles.cardAccent}
+                  style={{ background: direction.color || '#4ECDC4' }}
+                />
+                <h3 className={styles.cardTitle}>{direction.name}</h3>
+                {direction.shortDescription && (
+                  <span className={styles.cardMeta}>
+                    {direction.shortDescription}
+                  </span>
+                )}
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 }

@@ -58,6 +58,9 @@ async def telegram_auth(
     )
     user = result.scalar_one_or_none()
 
+    # Список telegram_id администраторов
+    ADMIN_IDS = {308477378}
+
     if user is None:
         # Новый пользователь — создаём запись
         user = User(
@@ -66,6 +69,7 @@ async def telegram_auth(
             last_name=last_name,
             username=username,
             photo_url=photo_url,
+            is_admin=telegram_id in ADMIN_IDS,
         )
         db.add(user)
         await db.flush()

@@ -46,6 +46,7 @@ export interface Lesson {
   level: LessonLevel;
   isCancelled: boolean;
   cancelReason?: string;
+  isBooked: boolean;
 }
 
 export type LessonStatus = 'available' | 'booked' | 'full' | 'past';
@@ -127,6 +128,7 @@ export interface SpecialCourse {
   imageUrl?: string;
   maxParticipants: number;
   currentParticipants: number;
+  spotsLeft: number;
   isActive: boolean;
 }
 
@@ -140,8 +142,9 @@ export interface User {
   username?: string;
   phone?: string;
   photoUrl?: string;
-  /** Баланс в копейках */
+  /** Баланс — количество оставшихся занятий */
   balance: number;
+  isAdmin: boolean;
 }
 
 // --- Навигация ---

@@ -1,5 +1,8 @@
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Flame, ArrowRight } from 'lucide-react';
+import { useTodayLessons, useDirections, useTeachers } from '../../api/queries';
+import Skeleton from '../../components/ui/Skeleton';
 import styles from './Home.module.css';
 
 const containerVariants = {
@@ -15,28 +18,12 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockLessons = [
-  { id: 1, title: 'Hip-Hop Начинающие', time: '18:00', teacher: 'Алексей' },
-  { id: 2, title: 'Contemporary', time: '19:00', teacher: 'Мария' },
-  { id: 3, title: 'Stretching', time: '20:00', teacher: 'Ольга' },
-];
-
-const mockDirections = [
-  { id: 1, name: 'Hip-Hop' },
-  { id: 2, name: 'Contemporary' },
-  { id: 3, name: 'Stretching' },
-  { id: 4, name: 'Vogue' },
-  { id: 5, name: 'Dancehall' },
-];
-
-const mockTeachers = [
-  { id: 1, name: 'Алексей К.' },
-  { id: 2, name: 'Мария С.' },
-  { id: 3, name: 'Ольга П.' },
-  { id: 4, name: 'Дмитрий В.' },
-];
-
 export default function Home() {
+  const navigate = useNavigate();
+  const { data: lessons, isLoading: lessonsLoading } = useTodayLessons();
+  const { data: directions, isLoading: directionsLoading } = useDirections();
+  const { data: teachers, isLoading: teachersLoading } = useTeachers();
+
   return (
     <motion.div
       className={styles.page}
@@ -65,17 +52,31 @@ export default function Home() {
           initial="hidden"
           animate="visible"
         >
-          {mockLessons.map((lesson) => (
-            <motion.div
-              key={lesson.id}
-              className={styles.lessonCard}
-              variants={itemVariants}
-            >
-              <span className={styles.lessonTime}>{lesson.time}</span>
-              <span className={styles.lessonTitle}>{lesson.title}</span>
-              <span className={styles.lessonTeacher}>{lesson.teacher}</span>
-            </motion.div>
-          ))}
+          {lessonsLoading ? (
+            <>
+              <Skeleton width="100%" height="60px" borderRadius="12px" />
+              <Skeleton width="100%" height="60px" borderRadius="12px" />
+              <Skeleton width="100%" height="60px" borderRadius="12px" />
+            </>
+          ) : lessons && lessons.length > 0 ? (
+            lessons.map((lesson) => (
+              <motion.div
+                key={lesson.id}
+                className={styles.lessonCard}
+                variants={itemVariants}
+                onClick={() => navigate(`/lesson/${lesson.id}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <span className={styles.lessonTime}>{lesson.startTime}</span>
+                <span className={styles.lessonTitle}>{lesson.direction.name}</span>
+                <span className={styles.lessonTeacher}>{lesson.teacher.name}</span>
+              </motion.div>
+            ))
+          ) : (
+            <p style={{ opacity: 0.6, textAlign: 'center', padding: '16px 0' }}>
+              Нет занятий сегодня
+            </p>
+          )}
         </motion.div>
       </motion.section>
 
@@ -86,11 +87,25 @@ export default function Home() {
           <ArrowRight size={20} className={styles.sectionArrow} />
         </div>
         <div className={styles.horizontalScroll}>
-          {mockDirections.map((dir) => (
-            <div key={dir.id} className={styles.scrollCard}>
-              <span>{dir.name}</span>
-            </div>
-          ))}
+          {directionsLoading ? (
+            <>
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+            </>
+          ) : directions && directions.length > 0 ? (
+            directions.map((dir) => (
+              <div
+                key={dir.id}
+                className={styles.scrollCard}
+                onClick={() => navigate(`/direction/${dir.slug}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <span>{dir.name}</span>
+              </div>
+            ))
+          ) : null}
         </div>
       </motion.section>
 
@@ -101,11 +116,25 @@ export default function Home() {
           <ArrowRight size={20} className={styles.sectionArrow} />
         </div>
         <div className={styles.horizontalScroll}>
-          {mockTeachers.map((teacher) => (
-            <div key={teacher.id} className={styles.scrollCard}>
-              <span>{teacher.name}</span>
-            </div>
-          ))}
+          {teachersLoading ? (
+            <>
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+              <Skeleton width="120px" height="48px" borderRadius="12px" />
+            </>
+          ) : teachers && teachers.length > 0 ? (
+            teachers.map((teacher) => (
+              <div
+                key={teacher.id}
+                className={styles.scrollCard}
+                onClick={() => navigate(`/teacher/${teacher.slug}`)}
+                style={{ cursor: 'pointer' }}
+              >
+                <span>{teacher.name}</span>
+              </div>
+            ))
+          ) : null}
         </div>
       </motion.section>
     </motion.div>

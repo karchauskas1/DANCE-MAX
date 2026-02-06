@@ -17,14 +17,15 @@
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: var(--space-md) var(--space-xl);
-  padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom, 8px));
+  padding: var(--space-lg) var(--space-xl);
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom, 8px));
   z-index: var(--z-nav);
 }
 
 /* ── Nav item ── */
 
 .item {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -75,10 +76,10 @@
 
 .indicator {
   position: absolute;
-  bottom: -8px;
+  top: calc(-1 * var(--space-lg));
   left: 50%;
   transform: translateX(-50%);
-  width: 20px;
+  width: 32px;
   height: 3px;
   border-radius: var(--radius-full);
   background: linear-gradient(
@@ -86,7 +87,6 @@
     var(--color-primary) 0%,
     var(--color-primary-dark) 100%
   );
-  box-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.5);
 }
 
 /* ── Light theme override ── */

@@ -1,5 +1,10 @@
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { BookOpen, Clock, User } from 'lucide-react';
+import { format } from 'date-fns';
+import { ru } from 'date-fns/locale';
+import Skeleton from '../../components/ui/Skeleton';
+import { useCourses } from '../../api/queries';
 import styles from './Courses.module.css';
 
 const containerVariants = {
@@ -15,42 +20,9 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockCourses = [
-  {
-    id: 1,
-    title: 'Интенсив по Hip-Hop',
-    teacher: 'Алексей К.',
-    dates: '20-25 января',
-    lessons: 6,
-    price: 4500,
-  },
-  {
-    id: 2,
-    title: 'Спецкурс Contemporary: импровизация',
-    teacher: 'Мария С.',
-    dates: '1-15 февраля',
-    lessons: 8,
-    price: 6000,
-  },
-  {
-    id: 3,
-    title: 'Vogue Intensive',
-    teacher: 'Дмитрий В.',
-    dates: '10-12 февраля',
-    lessons: 3,
-    price: 2500,
-  },
-  {
-    id: 4,
-    title: 'Stretching: глубокая растяжка',
-    teacher: 'Ольга П.',
-    dates: '5-28 февраля',
-    lessons: 12,
-    price: 8000,
-  },
-];
-
 export default function Courses() {
+  const { data: courses, isLoading } = useCourses();
+
   return (
     <motion.div
       className={styles.page}
@@ -63,35 +35,71 @@ export default function Courses() {
         Спецкурсы и интенсивы
       </motion.h1>
 
-      <motion.div
-        className={styles.list}
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {mockCourses.map((course) => (
-          <motion.div key={course.id} className={styles.card} variants={itemVariants}>
-            <div className={styles.cardImage} />
-            <div className={styles.cardBody}>
-              <h3 className={styles.cardTitle}>{course.title}</h3>
-              <div className={styles.cardMeta}>
-                <span className={styles.metaItem}>
-                  <User size={14} />
-                  {course.teacher}
-                </span>
-                <span className={styles.metaItem}>
-                  <Clock size={14} />
-                  {course.dates}
-                </span>
-              </div>
-              <div className={styles.cardFooter}>
-                <span className={styles.lessonsCount}>{course.lessons} занятий</span>
-                <span className={styles.price}>{course.price.toLocaleString('ru-RU')} руб.</span>
+      {isLoading ? (
+        <div className={styles.list}>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className={styles.card}>
+              <Skeleton width="100%" height={120} borderRadius="12px" />
+              <div className={styles.cardBody}>
+                <Skeleton width="70%" height={20} />
+                <Skeleton width="50%" height={14} />
+                <Skeleton width="40%" height={14} />
               </div>
             </div>
-          </motion.div>
-        ))}
-      </motion.div>
+          ))}
+        </div>
+      ) : !courses || courses.length === 0 ? (
+        <motion.p className={styles.empty} variants={itemVariants}>
+          Нет данных
+        </motion.p>
+      ) : (
+        <motion.div
+          className={styles.list}
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {courses.map((course) => (
+            <motion.div key={course.id} variants={itemVariants}>
+              <Link
+                to={`/course/${course.id}`}
+                className={styles.card}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+              >
+                <div className={styles.cardImage} />
+                <div className={styles.cardBody}>
+                  <h3 className={styles.cardTitle}>{course.name}</h3>
+                  <div className={styles.cardMeta}>
+                    {course.teacher && (
+                      <span className={styles.metaItem}>
+                        <User size={14} />
+                        {course.teacher.name}
+                      </span>
+                    )}
+                    <span className={styles.metaItem}>
+                      <Clock size={14} />
+                      {format(new Date(course.startDate), 'd MMMM yyyy', { locale: ru })}
+                    </span>
+                  </div>
+                  <div className={styles.cardFooter}>
+                    <span className={styles.lessonsCount}>
+                      {course.lessonsCount} занятий
+                    </span>
+                    <span className={styles.price}>
+                      {(course.price / 100).toLocaleString('ru-RU')} ₽
+                    </span>
+                  </div>
+                  {course.spotsLeft > 0 && (
+                    <span className={styles.spotsLeft}>
+                      Осталось {course.spotsLeft} мест
+                    </span>
+                  )}
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
+      )}
     </motion.div>
   );
 }

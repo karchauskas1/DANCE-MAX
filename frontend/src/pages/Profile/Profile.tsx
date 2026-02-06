@@ -1,6 +1,9 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, CalendarCheck, History, CreditCard, Info, Wallet } from 'lucide-react';
+import { ChevronRight, CalendarCheck, History, CreditCard, Info, Wallet, Shield } from 'lucide-react';
+import { useAuth } from '../../hooks/useAuth';
+import { useBalance } from '../../api/queries';
+import Skeleton from '../../components/ui/Skeleton';
 import styles from './Profile.module.css';
 
 const containerVariants = {
@@ -16,21 +19,30 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
-const mockUser = {
-  name: 'Иван Петров',
-  balance: 2400,
-  subscription: 'Абонемент на 8 занятий',
-  subscriptionLeft: 5,
-};
-
 const quickLinks = [
   { to: '/bookings', label: 'Мои записи', icon: CalendarCheck },
   { to: '/history', label: 'История', icon: History },
-  { to: '/payment', label: 'Оплата', icon: CreditCard },
+  { to: '/payment', label: 'Абонементы', icon: CreditCard },
   { to: '/about', label: 'О студии', icon: Info },
 ];
 
 export default function Profile() {
+  const { user, isLoading: authLoading } = useAuth();
+  const { data: balanceData, isLoading: balanceLoading } = useBalance();
+
+  const isLoading = authLoading || balanceLoading;
+
+  const displayName = user
+    ? [user.firstName, user.lastName].filter(Boolean).join(' ')
+    : '';
+
+  const initials = user
+    ? [user.firstName?.[0], user.lastName?.[0]].filter(Boolean).join('').toUpperCase()
+    : '';
+
+  const balance = balanceData?.balance ?? user?.balance ?? 0;
+  const activeSubscriptions = balanceData?.active_subscriptions ?? 0;
+
   return (
     <motion.div
       className={styles.page}
@@ -40,37 +52,72 @@ export default function Profile() {
     >
       {/* Avatar & Name */}
       <motion.div className={styles.header} variants={itemVariants}>
-        <div className={styles.avatar} />
-        <h1 className={styles.name}>{mockUser.name}</h1>
+        {isLoading ? (
+          <>
+            <Skeleton width="72px" height="72px" borderRadius="50%" />
+            <Skeleton width="160px" height="24px" borderRadius="8px" />
+          </>
+        ) : (
+          <>
+            {user?.photoUrl ? (
+              <img
+                src={user.photoUrl}
+                alt={displayName}
+                className={styles.avatar}
+                style={{ borderRadius: '50%', objectFit: 'cover' }}
+              />
+            ) : (
+              <div className={styles.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 700 }}>
+                {initials}
+              </div>
+            )}
+            <h1 className={styles.name}>{displayName}</h1>
+          </>
+        )}
       </motion.div>
 
       {/* Balance Widget */}
       <motion.div className={styles.balanceCard} variants={itemVariants}>
-        <div className={styles.balanceHeader}>
-          <Wallet size={20} className={styles.balanceIcon} />
-          <span className={styles.balanceLabel}>Баланс</span>
-        </div>
-        <span className={styles.balanceValue}>
-          {mockUser.balance.toLocaleString('ru-RU')} руб.
-        </span>
+        {isLoading ? (
+          <>
+            <Skeleton width="120px" height="20px" borderRadius="8px" />
+            <Skeleton width="80px" height="32px" borderRadius="8px" />
+          </>
+        ) : (
+          <>
+            <div className={styles.balanceHeader}>
+              <Wallet size={20} className={styles.balanceIcon} />
+              <span className={styles.balanceLabel}>Баланс</span>
+            </div>
+            <span className={styles.balanceValue}>
+              {balance} занятий
+            </span>
+          </>
+        )}
       </motion.div>
 
-      {/* Active Subscription */}
-      <motion.section className={styles.section} variants={itemVariants}>
-        <h2 className={styles.sectionTitle}>Активный абонемент</h2>
-        <div className={styles.subscriptionCard}>
-          <span className={styles.subscriptionName}>{mockUser.subscription}</span>
-          <span className={styles.subscriptionLeft}>
-            Осталось: {mockUser.subscriptionLeft} занятий
-          </span>
-          <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${(mockUser.subscriptionLeft / 8) * 100}%` }}
-            />
+      {/* Active Subscriptions */}
+      {!isLoading && activeSubscriptions > 0 && (
+        <motion.section className={styles.section} variants={itemVariants}>
+          <h2 className={styles.sectionTitle}>Активные абонементы</h2>
+          <div className={styles.subscriptionCard}>
+            <span className={styles.subscriptionName}>
+              Активных абонементов: {activeSubscriptions}
+            </span>
           </div>
-        </div>
-      </motion.section>
+        </motion.section>
+      )}
+
+      {/* Admin Panel Link */}
+      {user?.isAdmin && (
+        <motion.section className={styles.section} variants={itemVariants}>
+          <Link to="/admin" className={styles.linkItem} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Shield size={20} className={styles.linkIcon} />
+            <span className={styles.linkLabel}>Админ-панель</span>
+            <ChevronRight size={18} className={styles.linkArrow} />
+          </Link>
+        </motion.section>
+      )}
 
       {/* Quick Links */}
       <motion.section className={styles.section} variants={itemVariants}>

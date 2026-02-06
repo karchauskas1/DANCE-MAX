@@ -2,6 +2,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import BottomNav from './BottomNav';
+import { useAuth } from '../../hooks/useAuth';
 import styles from './AppShell.module.css';
 
 const pageVariants = {
@@ -12,6 +13,16 @@ const pageVariants = {
 
 export default function AppShell() {
   const location = useLocation();
+  const { isLoading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <div className={styles.splash}>
+        <span className={styles.splashTitle}>DanceMax</span>
+        <span className={styles.spinner} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.shell}>

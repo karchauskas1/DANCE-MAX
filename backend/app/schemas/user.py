@@ -21,6 +21,7 @@ class UserResponse(UserBase):
     telegram_id: int
     photo_url: str | None = None
     balance: int
+    is_admin: bool = False
     created_at: datetime
 
     model_config = {"from_attributes": True}
