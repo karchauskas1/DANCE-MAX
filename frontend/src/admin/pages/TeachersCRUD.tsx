@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, X, Upload, Star, Inbox } from 'lucide-react';
-import { useTeachers, useDirections } from '../../api/queries';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X, Upload, Star, Inbox, Loader2 } from 'lucide-react';
+import { useTeachers, useDirections, useCreateTeacher, useUpdateTeacher, useDeleteTeacher } from '../../api/queries';
 import { FormField } from '../components/FormField';
 import styles from './TeachersCRUD.module.css';
 import type { Teacher } from '../../types';
@@ -10,18 +10,40 @@ export function TeachersCRUD() {
   const { data: directionsData } = useDirections();
 
   const teachers = teachersData ?? [];
+  const allDirections = directionsData ?? [];
 
-  // Формируем опции направлений из реальных данных
-  const directionOptions = (directionsData ?? []).map((d) => ({
-    value: d.name,
-    label: d.name,
-  }));
+  const createMutation = useCreateTeacher();
+  const updateMutation = useUpdateTeacher();
+  const deleteMutation = useDeleteTeacher();
 
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Teacher | null>(null);
 
+  // Поля формы
+  const [name, setName] = useState('');
+  const [experienceYears, setExperienceYears] = useState('');
+  const [bio, setBio] = useState('');
+  const [selectedDirectionIds, setSelectedDirectionIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    if (editItem) {
+      setName(editItem.name);
+      setExperienceYears(String(editItem.experienceYears));
+      setBio(editItem.bio);
+      setSelectedDirectionIds(editItem.directions.map((d) => d.id));
+    }
+  }, [editItem]);
+
+  function resetForm() {
+    setName('');
+    setExperienceYears('');
+    setBio('');
+    setSelectedDirectionIds([]);
+  }
+
   function openCreate() {
     setEditItem(null);
+    resetForm();
     setShowModal(true);
   }
 
@@ -29,6 +51,41 @@ export function TeachersCRUD() {
     setEditItem(teacher);
     setShowModal(true);
   }
+
+  function closeModal() {
+    setShowModal(false);
+    setEditItem(null);
+    resetForm();
+  }
+
+  function toggleDirection(dirId: number) {
+    setSelectedDirectionIds((prev) =>
+      prev.includes(dirId) ? prev.filter((id) => id !== dirId) : [...prev, dirId],
+    );
+  }
+
+  async function handleSubmit() {
+    const payload = {
+      name,
+      bio,
+      experience_years: Number(experienceYears) || 0,
+      direction_ids: selectedDirectionIds,
+    };
+
+    if (editItem) {
+      await updateMutation.mutateAsync({ id: editItem.id, payload });
+    } else {
+      await createMutation.mutateAsync(payload);
+    }
+    closeModal();
+  }
+
+  async function handleDelete(teacher: Teacher) {
+    if (!window.confirm(`Удалить преподавателя "${teacher.name}"?`)) return;
+    await deleteMutation.mutateAsync({ id: teacher.id });
+  }
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className={styles.page}>
@@ -72,7 +129,12 @@ export function TeachersCRUD() {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className={styles.cardActionBtnDanger} type="button">
+                  <button
+                    className={styles.cardActionBtnDanger}
+                    onClick={() => handleDelete(teacher)}
+                    disabled={deleteMutation.isPending}
+                    type="button"
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -107,7 +169,7 @@ export function TeachersCRUD() {
 
       {/* Modal -- bottom-sheet style on mobile */}
       {showModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>
@@ -115,7 +177,7 @@ export function TeachersCRUD() {
               </h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -132,36 +194,40 @@ export function TeachersCRUD() {
               <FormField
                 label="Имя"
                 type="text"
-                value={editItem?.name ?? ''}
+                value={name}
+                onChange={setName}
                 placeholder="Анна Калинина"
                 required
               />
               <FormField
                 label="Опыт (лет)"
                 type="number"
-                value={editItem?.experienceYears ?? ''}
+                value={experienceYears}
+                onChange={setExperienceYears}
                 placeholder="8"
                 required
               />
               <FormField
                 label="Биография"
                 type="textarea"
-                value={editItem?.bio ?? ''}
+                value={bio}
+                onChange={setBio}
                 placeholder="Расскажите о преподавателе..."
                 required
               />
               <div className={styles.directionsSelect}>
                 <span className={styles.fieldLabel}>Направления</span>
                 <div className={styles.directionTags}>
-                  {directionOptions.map((d) => {
-                    const isSelected = editItem?.directions.some((dir) => dir.name === d.value) ?? false;
+                  {allDirections.map((d) => {
+                    const isSelected = selectedDirectionIds.includes(d.id);
                     return (
                       <button
-                        key={d.value}
+                        key={d.id}
                         type="button"
                         className={`${styles.directionTag} ${isSelected ? styles.directionTagActive : ''}`}
+                        onClick={() => toggleDirection(d.id)}
                       >
-                        {d.label}
+                        {d.name}
                       </button>
                     );
                   })}
@@ -171,12 +237,18 @@ export function TeachersCRUD() {
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleSubmit}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving && <Loader2 size={16} className={styles.spinner} />}
                 {editItem ? 'Сохранить' : 'Создать'}
               </button>
             </div>

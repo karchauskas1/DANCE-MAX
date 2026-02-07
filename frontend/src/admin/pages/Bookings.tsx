@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { Check, X as XIcon, Filter, Inbox } from 'lucide-react';
-import { useMyBookings } from '../../api/queries';
+import { useMyBookings, useMarkAttendance } from '../../api/queries';
 import { DataTable } from '../components/DataTable';
 import type { Column } from '../components/DataTable';
 import styles from './Bookings.module.css';
 
-// Плоская структура для DataTable (admin endpoint /api/admin/bookings ещё не реализован,
-// используем useMyBookings как fallback).
+// Плоская структура для DataTable
 interface BookingRow {
   id: number;
   student: string;
@@ -30,6 +29,7 @@ const dateFilters = ['Все', 'Сегодня', 'Вчера', 'Эта неде�
 export function Bookings() {
   const [activeFilter, setActiveFilter] = useState('Все');
   const { data: bookingsData, isLoading } = useMyBookings();
+  const attendanceMutation = useMarkAttendance();
 
   // Маппим данные из API в плоскую структуру для DataTable
   const bookings: BookingRow[] = (bookingsData ?? []).map((b) => ({
@@ -41,6 +41,10 @@ export function Bookings() {
     time: b.lesson?.startTime ?? '—',
     status: b.status,
   }));
+
+  async function handleMarkAttendance(bookingId: number) {
+    await attendanceMutation.mutateAsync({ bookingId });
+  }
 
   const columns: Column<BookingRow>[] = [
     { key: 'student', header: 'Ученик', sortable: true },
@@ -105,7 +109,13 @@ export function Bookings() {
               <>
                 {row.status === 'active' && (
                   <>
-                    <button className={styles.attendBtn} type="button" title="Отметить посещение">
+                    <button
+                      className={styles.attendBtn}
+                      type="button"
+                      title="Отметить посещение"
+                      onClick={() => handleMarkAttendance(row.id)}
+                      disabled={attendanceMutation.isPending}
+                    >
                       <Check size={16} />
                     </button>
                     <button className={styles.missBtn} type="button" title="Отметить пропуск">

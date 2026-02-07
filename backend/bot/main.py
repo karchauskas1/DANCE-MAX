@@ -1,39 +1,33 @@
-"""Точка входа для Telegram-бота Dance Max.
+"""Точка входа для Telegram-бота Dance Max (режим polling).
 
-Использует aiogram 3 с поддержкой Telegram Web App.
+Используется ТОЛЬКО для локальной разработки.
+В продакшене (Vercel) бот работает через webhook,
+интегрированный в FastAPI (см. app/api/routes/webhook.py).
+
+Запуск: python -m bot.main
 """
 
 import asyncio
 import logging
 
-from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
+from aiogram.types import MenuButtonWebApp, WebAppInfo
 
+from app.core.bot import bot, dp, setup_dispatcher
 from app.core.config import settings
-from bot.handlers import start, balance, schedule, help
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
 async def main() -> None:
-    """Инициализация и запуск бота."""
-    bot = Bot(
-        token=settings.TELEGRAM_BOT_TOKEN,
-        default=DefaultBotProperties(parse_mode=ParseMode.HTML),
-    )
-    dp = Dispatcher()
+    """Инициализация и запуск бота в режиме polling (для локальной разработки)."""
+    # Регистрируем хендлеры
+    setup_dispatcher()
 
-    # Регистрация хендлеров
-    dp.include_router(start.router)
-    dp.include_router(balance.router)
-    dp.include_router(schedule.router)
-    dp.include_router(help.router)
+    # Удаляем webhook, если был установлен ранее (polling и webhook несовместимы)
+    await bot.delete_webhook(drop_pending_updates=True)
 
     # Установка меню-кнопки с Web App
-    from aiogram.types import MenuButtonWebApp, WebAppInfo
-
     await bot.set_chat_menu_button(
         menu_button=MenuButtonWebApp(
             text="Открыть приложение",
@@ -41,7 +35,7 @@ async def main() -> None:
         )
     )
 
-    logger.info("DanceMax Bot запущен")
+    logger.info("DanceMax Bot запущен (polling mode)")
     await dp.start_polling(bot)
 
 

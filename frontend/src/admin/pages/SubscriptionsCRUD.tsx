@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, X, Zap, Crown, Sparkles, Inbox } from 'lucide-react';
-import { usePaymentPlans } from '../../api/queries';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X, Zap, Crown, Sparkles, Inbox, Loader2 } from 'lucide-react';
+import { usePaymentPlans, useCreateSubscription, useUpdateSubscription, useDeleteSubscription } from '../../api/queries';
 import type { SubscriptionPlanWithPrice } from '../../api/mappers';
 import { FormField } from '../components/FormField';
 import styles from './SubscriptionsCRUD.module.css';
@@ -16,11 +16,41 @@ export function SubscriptionsCRUD() {
   const { data: plansData, isLoading } = usePaymentPlans();
   const plans = plansData ?? [];
 
+  const createMutation = useCreateSubscription();
+  const updateMutation = useUpdateSubscription();
+  const deleteMutation = useDeleteSubscription();
+
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<SubscriptionPlanWithPrice | null>(null);
 
+  // Поля формы
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+  const [lessonsCount, setLessonsCount] = useState('');
+  const [validityDays, setValidityDays] = useState('');
+  const [price, setPrice] = useState('');
+
+  useEffect(() => {
+    if (editItem) {
+      setName(editItem.name);
+      setDescription(editItem.description ?? '');
+      setLessonsCount(String(editItem.lessonsCount));
+      setValidityDays(String(editItem.validityDays));
+      setPrice(String(editItem.price));
+    }
+  }, [editItem]);
+
+  function resetForm() {
+    setName('');
+    setDescription('');
+    setLessonsCount('');
+    setValidityDays('');
+    setPrice('');
+  }
+
   function openCreate() {
     setEditItem(null);
+    resetForm();
     setShowModal(true);
   }
 
@@ -28,6 +58,36 @@ export function SubscriptionsCRUD() {
     setEditItem(sub);
     setShowModal(true);
   }
+
+  function closeModal() {
+    setShowModal(false);
+    setEditItem(null);
+    resetForm();
+  }
+
+  async function handleSubmit() {
+    const payload = {
+      name,
+      description: description || undefined,
+      lessons_count: Number(lessonsCount) || 0,
+      validity_days: Number(validityDays) || 0,
+      price: Number(price) || 0,
+    };
+
+    if (editItem) {
+      await updateMutation.mutateAsync({ id: editItem.id, payload });
+    } else {
+      await createMutation.mutateAsync(payload);
+    }
+    closeModal();
+  }
+
+  async function handleDelete(sub: SubscriptionPlanWithPrice) {
+    if (!window.confirm(`Удалить абонемент "${sub.name}"?`)) return;
+    await deleteMutation.mutateAsync({ id: sub.id });
+  }
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className={styles.page}>
@@ -71,7 +131,12 @@ export function SubscriptionsCRUD() {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className={styles.cardActionBtnDanger} type="button">
+                  <button
+                    className={styles.cardActionBtnDanger}
+                    onClick={() => handleDelete(sub)}
+                    disabled={deleteMutation.isPending}
+                    type="button"
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -111,7 +176,7 @@ export function SubscriptionsCRUD() {
 
       {/* Modal -- bottom-sheet style on mobile */}
       {showModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>
@@ -119,7 +184,7 @@ export function SubscriptionsCRUD() {
               </h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -129,28 +194,32 @@ export function SubscriptionsCRUD() {
               <FormField
                 label="Название"
                 type="text"
-                value={editItem?.name ?? ''}
+                value={name}
+                onChange={setName}
                 placeholder="Стандарт"
                 required
               />
               <FormField
                 label="Описание"
                 type="textarea"
-                value={editItem?.description ?? ''}
+                value={description}
+                onChange={setDescription}
                 placeholder="Описание абонемента..."
               />
               <div className={styles.formRow}>
                 <FormField
                   label="Кол-во занятий"
                   type="number"
-                  value={editItem?.lessonsCount ?? ''}
+                  value={lessonsCount}
+                  onChange={setLessonsCount}
                   placeholder="8"
                   required
                 />
                 <FormField
                   label="Срок (дней)"
                   type="number"
-                  value={editItem?.validityDays ?? ''}
+                  value={validityDays}
+                  onChange={setValidityDays}
                   placeholder="30"
                   required
                 />
@@ -158,7 +227,8 @@ export function SubscriptionsCRUD() {
               <FormField
                 label="Цена (руб.)"
                 type="number"
-                value={editItem?.price ?? ''}
+                value={price}
+                onChange={setPrice}
                 placeholder="5600"
                 required
               />
@@ -166,12 +236,18 @@ export function SubscriptionsCRUD() {
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleSubmit}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving && <Loader2 size={16} className={styles.spinner} />}
                 {editItem ? 'Сохранить' : 'Создать'}
               </button>
             </div>

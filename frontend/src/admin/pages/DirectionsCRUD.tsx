@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, X, Flame, Heart, Moon, Music, Inbox } from 'lucide-react';
-import { useDirections } from '../../api/queries';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X, Flame, Heart, Moon, Music, Inbox, Loader2 } from 'lucide-react';
+import { useDirections, useCreateDirection, useUpdateDirection, useDeleteDirection } from '../../api/queries';
 import { FormField } from '../components/FormField';
 import styles from './DirectionsCRUD.module.css';
 import type { Direction } from '../../types';
@@ -16,24 +16,79 @@ export function DirectionsCRUD() {
   const { data: directionsData, isLoading } = useDirections();
   const directions = directionsData ?? [];
 
+  const createMutation = useCreateDirection();
+  const updateMutation = useUpdateDirection();
+  const deleteMutation = useDeleteDirection();
+
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Direction | null>(null);
+
+  // Поля формы
+  const [name, setName] = useState('');
+  const [slug, setSlug] = useState('');
+  const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('flame');
   const [selectedColor, setSelectedColor] = useState('#FF5C35');
 
-  function openCreate() {
-    setEditItem(null);
+  // Заполняем форму при открытии редактирования
+  useEffect(() => {
+    if (editItem) {
+      setName(editItem.name);
+      setSlug(editItem.slug);
+      setDescription(editItem.description);
+      setSelectedIcon(editItem.icon);
+      setSelectedColor(editItem.color);
+    }
+  }, [editItem]);
+
+  function resetForm() {
+    setName('');
+    setSlug('');
+    setDescription('');
     setSelectedIcon('flame');
     setSelectedColor('#FF5C35');
+  }
+
+  function openCreate() {
+    setEditItem(null);
+    resetForm();
     setShowModal(true);
   }
 
   function openEdit(dir: Direction) {
     setEditItem(dir);
-    setSelectedIcon(dir.icon);
-    setSelectedColor(dir.color);
     setShowModal(true);
   }
+
+  function closeModal() {
+    setShowModal(false);
+    setEditItem(null);
+    resetForm();
+  }
+
+  async function handleSubmit() {
+    const payload = {
+      name,
+      slug,
+      description,
+      icon: selectedIcon,
+      color: selectedColor,
+    };
+
+    if (editItem) {
+      await updateMutation.mutateAsync({ id: editItem.id, payload });
+    } else {
+      await createMutation.mutateAsync(payload);
+    }
+    closeModal();
+  }
+
+  async function handleDelete(dir: Direction) {
+    if (!window.confirm(`Удалить направление "${dir.name}"?`)) return;
+    await deleteMutation.mutateAsync({ id: dir.id });
+  }
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className={styles.page}>
@@ -74,7 +129,12 @@ export function DirectionsCRUD() {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className={styles.cardActionBtnDanger} type="button">
+                  <button
+                    className={styles.cardActionBtnDanger}
+                    onClick={() => handleDelete(dir)}
+                    disabled={deleteMutation.isPending}
+                    type="button"
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -102,7 +162,7 @@ export function DirectionsCRUD() {
 
       {/* Modal -- bottom-sheet on mobile */}
       {showModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>
@@ -110,7 +170,7 @@ export function DirectionsCRUD() {
               </h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -120,21 +180,24 @@ export function DirectionsCRUD() {
               <FormField
                 label="Название"
                 type="text"
-                value={editItem?.name ?? ''}
+                value={name}
+                onChange={setName}
                 placeholder="Бачата"
                 required
               />
               <FormField
                 label="Slug"
                 type="text"
-                value={editItem?.slug ?? ''}
+                value={slug}
+                onChange={setSlug}
                 placeholder="bachata"
                 required
               />
               <FormField
                 label="Описание"
                 type="textarea"
-                value={editItem?.description ?? ''}
+                value={description}
+                onChange={setDescription}
                 placeholder="Описание направления..."
                 required
               />
@@ -163,12 +226,18 @@ export function DirectionsCRUD() {
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleSubmit}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving && <Loader2 size={16} className={styles.spinner} />}
                 {editItem ? 'Сохранить' : 'Создать'}
               </button>
             </div>

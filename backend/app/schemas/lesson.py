@@ -23,6 +23,7 @@ class LessonResponse(BaseModel):
     is_cancelled: bool
     cancel_reason: str | None
     is_booked: bool = False  # записан ли текущий пользователь
+    booking_id: int | None = None  # ID бронирования текущего пользователя
 
     model_config = {"from_attributes": True}
 

@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Plus, Pencil, Trash2, X, Copy, Tag, Inbox } from 'lucide-react';
-import { usePromotions } from '../../api/queries';
+import { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, X, Copy, Tag, Inbox, Loader2 } from 'lucide-react';
+import { usePromotions, useCreatePromo, useUpdatePromo, useDeletePromo } from '../../api/queries';
 import { FormField } from '../components/FormField';
 import styles from './PromosCRUD.module.css';
 import type { Promotion } from '../../types';
@@ -14,11 +14,55 @@ export function PromosCRUD() {
   const { data: promosData, isLoading } = usePromotions();
   const promos = promosData ?? [];
 
+  const createMutation = useCreatePromo();
+  const updateMutation = useUpdatePromo();
+  const deleteMutation = useDeletePromo();
+
   const [showModal, setShowModal] = useState(false);
   const [editItem, setEditItem] = useState<Promotion | null>(null);
 
+  // Поля формы
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [promoCode, setPromoCode] = useState('');
+  const [discountType, setDiscountType] = useState<'percent' | 'fixed'>('percent');
+  const [discountValue, setDiscountValue] = useState('');
+  const [validFrom, setValidFrom] = useState('');
+  const [validUntil, setValidUntil] = useState('');
+
+  useEffect(() => {
+    if (editItem) {
+      setTitle(editItem.title);
+      setDescription(editItem.description);
+      setPromoCode(editItem.promoCode ?? '');
+      if (editItem.discountPercent) {
+        setDiscountType('percent');
+        setDiscountValue(String(editItem.discountPercent));
+      } else if (editItem.discountAmount) {
+        setDiscountType('fixed');
+        setDiscountValue(String(editItem.discountAmount));
+      } else {
+        setDiscountType('percent');
+        setDiscountValue('');
+      }
+      setValidFrom(editItem.validFrom);
+      setValidUntil(editItem.validUntil);
+    }
+  }, [editItem]);
+
+  function resetForm() {
+    setTitle('');
+    setDescription('');
+    setPromoCode('');
+    setDiscountType('percent');
+    setDiscountValue('');
+    setValidFrom('');
+    setValidUntil('');
+  }
+
   function openCreate() {
     setEditItem(null);
+    resetForm();
     setShowModal(true);
   }
 
@@ -26,6 +70,39 @@ export function PromosCRUD() {
     setEditItem(promo);
     setShowModal(true);
   }
+
+  function closeModal() {
+    setShowModal(false);
+    setEditItem(null);
+    resetForm();
+  }
+
+  async function handleSubmit() {
+    const discountNum = Number(discountValue) || 0;
+    const payload = {
+      title,
+      description,
+      promo_code: promoCode,
+      discount_percent: discountType === 'percent' ? discountNum : undefined,
+      discount_amount: discountType === 'fixed' ? discountNum : undefined,
+      valid_from: validFrom,
+      valid_until: validUntil,
+    };
+
+    if (editItem) {
+      await updateMutation.mutateAsync({ id: editItem.id, payload });
+    } else {
+      await createMutation.mutateAsync(payload);
+    }
+    closeModal();
+  }
+
+  async function handleDelete(promo: Promotion) {
+    if (!window.confirm(`Удалить акцию "${promo.title}"?`)) return;
+    await deleteMutation.mutateAsync({ id: promo.id });
+  }
+
+  const isSaving = createMutation.isPending || updateMutation.isPending;
 
   return (
     <div className={styles.page}>
@@ -63,7 +140,12 @@ export function PromosCRUD() {
                   >
                     <Pencil size={15} />
                   </button>
-                  <button className={styles.cardActionBtnDanger} type="button">
+                  <button
+                    className={styles.cardActionBtnDanger}
+                    onClick={() => handleDelete(promo)}
+                    disabled={deleteMutation.isPending}
+                    type="button"
+                  >
                     <Trash2 size={15} />
                   </button>
                 </div>
@@ -80,7 +162,12 @@ export function PromosCRUD() {
                   {promo.promoCode && (
                     <div className={styles.codeWrap}>
                       <code className={styles.promoCode}>{promo.promoCode}</code>
-                      <button className={styles.copyBtn} type="button" title="Скопировать">
+                      <button
+                        className={styles.copyBtn}
+                        type="button"
+                        title="Скопировать"
+                        onClick={() => navigator.clipboard.writeText(promo.promoCode ?? '')}
+                      >
                         <Copy size={13} />
                       </button>
                     </div>
@@ -104,7 +191,7 @@ export function PromosCRUD() {
 
       {/* Modal -- bottom-sheet style on mobile */}
       {showModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>
@@ -112,7 +199,7 @@ export function PromosCRUD() {
               </h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -122,51 +209,75 @@ export function PromosCRUD() {
               <FormField
                 label="Название"
                 type="text"
-                value={editItem?.title ?? ''}
+                value={title}
+                onChange={setTitle}
                 placeholder="Новичок"
                 required
               />
               <FormField
                 label="Описание"
                 type="textarea"
-                value={editItem?.description ?? ''}
+                value={description}
+                onChange={setDescription}
                 placeholder="Описание акции..."
                 required
               />
               <FormField
                 label="Промокод"
                 type="text"
-                value={editItem?.promoCode ?? ''}
+                value={promoCode}
+                onChange={setPromoCode}
                 placeholder="NEW20"
                 required
               />
               <FormField
                 label="Тип скидки"
                 type="select"
+                value={discountType}
+                onChange={(v) => setDiscountType(v as 'percent' | 'fixed')}
                 options={discountTypeOptions}
                 required
               />
               <FormField
                 label="Размер скидки"
                 type="number"
-                value={editItem?.discountPercent ?? editItem?.discountAmount ?? ''}
+                value={discountValue}
+                onChange={setDiscountValue}
                 placeholder="20"
                 required
               />
               <div className={styles.formRow}>
-                <FormField label="Действует с" type="date" required />
-                <FormField label="Действует до" type="date" required />
+                <FormField
+                  label="Действует с"
+                  type="date"
+                  value={validFrom}
+                  onChange={setValidFrom}
+                  required
+                />
+                <FormField
+                  label="Действует до"
+                  type="date"
+                  value={validUntil}
+                  onChange={setValidUntil}
+                  required
+                />
               </div>
             </div>
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleSubmit}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving && <Loader2 size={16} className={styles.spinner} />}
                 {editItem ? 'Сохранить' : 'Создать'}
               </button>
             </div>

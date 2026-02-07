@@ -7,8 +7,9 @@ import {
   Clock,
   Eye,
   Inbox,
+  Loader2,
 } from 'lucide-react';
-import { useDirections } from '../../api/queries';
+import { useDirections, useSendBroadcast } from '../../api/queries';
 import { FormField } from '../components/FormField';
 import styles from './Broadcast.module.css';
 
@@ -23,16 +24,41 @@ const audienceInfo: Record<Audience, { label: string; count: number; icon: React
 export function Broadcast() {
   const [audience, setAudience] = useState<Audience>('all');
   const [message, setMessage] = useState('');
+  const [directionId, setDirectionId] = useState('');
   const [scheduleEnabled, setScheduleEnabled] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
   const { data: directionsData } = useDirections();
+  const broadcastMutation = useSendBroadcast();
 
   // Формируем опции направлений из реальных данных
   const directionOptions = (directionsData ?? []).map((d) => ({
-    value: d.slug,
+    value: String(d.id),
     label: d.name,
   }));
+
+  async function handleSend() {
+    if (!message.trim()) return;
+
+    const payload = {
+      audience,
+      direction_id: audience === 'by_direction' ? Number(directionId) : undefined,
+      message,
+      schedule_at: scheduleEnabled && scheduleDate && scheduleTime
+        ? `${scheduleDate}T${scheduleTime}`
+        : undefined,
+    };
+
+    await broadcastMutation.mutateAsync(payload);
+    // Очищаем форму после успешной отправки
+    setMessage('');
+    setDirectionId('');
+    setScheduleEnabled(false);
+    setScheduleDate('');
+    setScheduleTime('');
+  }
 
   return (
     <div className={styles.page}>
@@ -72,6 +98,8 @@ export function Broadcast() {
           <FormField
             label="Направление"
             type="select"
+            value={directionId}
+            onChange={setDirectionId}
             options={directionOptions}
             required
           />
@@ -104,8 +132,18 @@ export function Broadcast() {
           </label>
           {scheduleEnabled && (
             <div className={styles.scheduleRow}>
-              <FormField label="Дата" type="date" />
-              <FormField label="Время" type="time" />
+              <FormField
+                label="Дата"
+                type="date"
+                value={scheduleDate}
+                onChange={setScheduleDate}
+              />
+              <FormField
+                label="Время"
+                type="time"
+                value={scheduleTime}
+                onChange={setScheduleTime}
+              />
             </div>
           )}
         </div>
@@ -120,11 +158,25 @@ export function Broadcast() {
             <Eye size={16} />
             Предпросмотр
           </button>
-          <button className={styles.sendBtn} type="button">
-            <Send size={16} />
+          <button
+            className={styles.sendBtn}
+            type="button"
+            onClick={handleSend}
+            disabled={broadcastMutation.isPending || !message.trim()}
+          >
+            {broadcastMutation.isPending
+              ? <Loader2 size={16} className={styles.spinner} />
+              : <Send size={16} />
+            }
             {scheduleEnabled ? 'Запланировать' : 'Отправить'}
           </button>
         </div>
+
+        {broadcastMutation.isSuccess && (
+          <div className={styles.successMessage}>
+            Рассылка успешно {scheduleEnabled ? 'запланирована' : 'отправлена'}
+          </div>
+        )}
       </div>
 
       {/* History */}

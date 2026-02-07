@@ -7,7 +7,7 @@ import {
   ArrowRight,
   Inbox,
 } from 'lucide-react';
-import { useTodayLessons, useMyBookings } from '../../api/queries';
+import { useAdminDashboard, useTodayLessons, useMyBookings } from '../../api/queries';
 import { StatCard } from '../components/StatCard';
 import styles from './Dashboard.module.css';
 
@@ -19,23 +19,27 @@ const statusLabels: Record<string, string> = {
 };
 
 export function Dashboard() {
+  const { data: dashboardData, isLoading: dashLoading } = useAdminDashboard();
   const { data: todayLessonsData, isLoading: lessonsLoading } = useTodayLessons();
   const { data: bookingsData, isLoading: bookingsLoading } = useMyBookings();
 
   const todayLessons = todayLessonsData ?? [];
   const recentBookings = bookingsData ?? [];
 
+  // Используем данные из admin dashboard, если доступны; иначе fallback на todayLessons
+  const todayStudentsCount = dashboardData?.todayStudentsCount
+    ?? todayLessons.reduce((acc, l) => acc + (l.currentSpots ?? 0), 0);
+  const todayLessonsCount = dashboardData?.todayLessonsCount ?? todayLessons.length;
+  const activeSubscriptionsCount = dashboardData?.activeSubscriptionsCount ?? 0;
+  const monthlyRevenue = dashboardData?.monthlyRevenue ?? 0;
+
+  const statsLoading = dashLoading && lessonsLoading;
+
   const todayDate = new Date().toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
-
-  // Считаем суммарное количество учеников на сегодняшних занятиях
-  const totalStudentsToday = todayLessons.reduce(
-    (acc, l) => acc + (l.currentSpots ?? 0),
-    0,
-  );
 
   return (
     <div className={styles.page}>
@@ -49,22 +53,22 @@ export function Dashboard() {
         <StatCard
           icon={<Users size={20} />}
           label="Учеников сегодня"
-          value={lessonsLoading ? '—' : String(totalStudentsToday)}
+          value={statsLoading ? '—' : String(todayStudentsCount)}
         />
         <StatCard
           icon={<CreditCard size={20} />}
           label="Активных абонементов"
-          value="—"
+          value={statsLoading ? '—' : String(activeSubscriptionsCount)}
         />
         <StatCard
           icon={<TrendingUp size={20} />}
           label="Выручка (месяц)"
-          value="—"
+          value={statsLoading ? '—' : `${monthlyRevenue.toLocaleString('ru-RU')} \u20BD`}
         />
         <StatCard
           icon={<CalendarDays size={20} />}
           label="Занятий сегодня"
-          value={lessonsLoading ? '—' : String(todayLessons.length)}
+          value={statsLoading ? '—' : String(todayLessonsCount)}
         />
       </div>
 

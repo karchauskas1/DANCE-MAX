@@ -60,4 +60,14 @@ export const queryKeys = {
     all: ['promos'] as const,
     list: () => ['promos', 'list'] as const,
   },
+
+  // ---- Admin ----
+  admin: {
+    dashboard: () => ['admin', 'dashboard'] as const,
+    students: () => ['admin', 'students'] as const,
+    subscriptions: {
+      all: ['admin', 'subscriptions'] as const,
+      list: () => ['admin', 'subscriptions', 'list'] as const,
+    },
+  },
 } as const;

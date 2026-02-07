@@ -66,7 +66,9 @@ export default function Lesson() {
   };
 
   const handleCancel = () => {
-    cancelBooking.mutate({ bookingId: lesson.id });
+    if (lesson.bookingId) {
+      cancelBooking.mutate({ bookingId: lesson.bookingId });
+    }
   };
 
   return (

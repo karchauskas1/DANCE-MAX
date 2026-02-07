@@ -58,8 +58,8 @@ async def telegram_auth(
     )
     user = result.scalar_one_or_none()
 
-    # Список telegram_id администраторов
-    ADMIN_IDS = {308477378}
+    # Список telegram_id администраторов (из переменной окружения)
+    ADMIN_IDS = {int(x.strip()) for x in settings.ADMIN_IDS.split(",") if x.strip()}
 
     if user is None:
         # Новый пользователь — создаём запись

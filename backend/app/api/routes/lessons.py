@@ -45,10 +45,15 @@ def _build_lesson_response(lesson: Lesson, user_id: int | None) -> LessonRespons
     active_bookings = [b for b in lesson.bookings if b.status == "active"]
     current_spots = len(active_bookings)
 
-    # Проверяем, записан ли текущий пользователь
+    # Проверяем, записан ли текущий пользователь, и находим ID бронирования
     is_booked = False
+    booking_id = None
     if user_id is not None:
-        is_booked = any(b.user_id == user_id and b.status == "active" for b in lesson.bookings)
+        for b in lesson.bookings:
+            if b.user_id == user_id and b.status == "active":
+                is_booked = True
+                booking_id = b.id
+                break
 
     return LessonResponse(
         id=lesson.id,
@@ -64,6 +69,7 @@ def _build_lesson_response(lesson: Lesson, user_id: int | None) -> LessonRespons
         is_cancelled=lesson.is_cancelled,
         cancel_reason=lesson.cancel_reason,
         is_booked=is_booked,
+        booking_id=booking_id,
     )
 
 
@@ -170,11 +176,16 @@ async def get_lesson_detail(
     active_bookings = [b for b in lesson.bookings if b.status == "active"]
     current_spots = len(active_bookings)
 
-    # Проверяем запись текущего пользователя
+    # Проверяем запись текущего пользователя и находим ID бронирования
     user_id = user.id if user else None
     is_booked = False
+    booking_id = None
     if user_id is not None:
-        is_booked = any(b.user_id == user_id and b.status == "active" for b in lesson.bookings)
+        for b in lesson.bookings:
+            if b.user_id == user_id and b.status == "active":
+                is_booked = True
+                booking_id = b.id
+                break
 
     return LessonDetailResponse(
         id=lesson.id,
@@ -201,4 +212,5 @@ async def get_lesson_detail(
         is_cancelled=lesson.is_cancelled,
         cancel_reason=lesson.cancel_reason,
         is_booked=is_booked,
+        booking_id=booking_id,
     )

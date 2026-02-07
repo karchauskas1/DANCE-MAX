@@ -11,6 +11,8 @@ celery>=5.4.0
 httpx>=0.28.0
 python-multipart>=0.0.18
 aiogram>=3.24.0
+sentry-sdk[fastapi]>=2.0.0
+slowapi>=0.1.9
 
 # Testing
 pytest>=8.3.0

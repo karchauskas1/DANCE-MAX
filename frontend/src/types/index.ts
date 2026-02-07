@@ -47,6 +47,7 @@ export interface Lesson {
   isCancelled: boolean;
   cancelReason?: string;
   isBooked: boolean;
+  bookingId?: number;
 }
 
 export type LessonStatus = 'available' | 'booked' | 'full' | 'past';

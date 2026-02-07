@@ -1,32 +1,39 @@
 import { useState } from 'react';
-import { Eye, PencilLine, X, Inbox } from 'lucide-react';
+import { Eye, PencilLine, X, Inbox, Loader2 } from 'lucide-react';
+import { useAdminStudents, useAdjustBalance } from '../../api/queries';
+import type { AdminStudent } from '../../api/queries';
 import { DataTable } from '../components/DataTable';
 import type { Column } from '../components/DataTable';
 import { FormField } from '../components/FormField';
 import styles from './Students.module.css';
 
-// Тип для студентов — admin endpoint /api/admin/students пока не реализован,
-// поэтому показываем пустую таблицу. Когда endpoint появится, данные заполнятся.
-interface Student {
-  id: number;
-  name: string;
-  username: string;
-  phone: string;
-  balance: number;
-  totalLessons: number;
-  lastVisit: string;
-  [key: string]: unknown;
-}
-
 export function Students() {
-  const [balanceModal, setBalanceModal] = useState<Student | null>(null);
+  const { data: studentsData, isLoading } = useAdminStudents();
+  const students: AdminStudent[] = studentsData ?? [];
+
+  const adjustMutation = useAdjustBalance();
+
+  const [balanceModal, setBalanceModal] = useState<AdminStudent | null>(null);
   const [adjustAmount, setAdjustAmount] = useState('');
+  const [adjustReason, setAdjustReason] = useState('');
 
-  // Admin endpoint не реализован — используем пустой массив
-  const students: Student[] = [];
-  const isLoading = false;
+  function closeModal() {
+    setBalanceModal(null);
+    setAdjustAmount('');
+    setAdjustReason('');
+  }
 
-  const columns: Column<Student>[] = [
+  async function handleAdjustBalance() {
+    if (!balanceModal) return;
+    await adjustMutation.mutateAsync({
+      studentId: balanceModal.id,
+      amount: Number(adjustAmount) || 0,
+      reason: adjustReason,
+    });
+    closeModal();
+  }
+
+  const columns: Column<AdminStudent>[] = [
     {
       key: 'name',
       header: 'Ученик',
@@ -92,6 +99,7 @@ export function Students() {
                   onClick={() => {
                     setBalanceModal(row);
                     setAdjustAmount('');
+                    setAdjustReason('');
                   }}
                 >
                   <PencilLine size={16} />
@@ -104,13 +112,13 @@ export function Students() {
 
       {/* Balance adjustment modal -- bottom-sheet on mobile */}
       {balanceModal && (
-        <div className={styles.modalBackdrop} onClick={() => setBalanceModal(null)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>Корректировка баланса</h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setBalanceModal(null)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -132,18 +140,26 @@ export function Students() {
               <FormField
                 label="Причина"
                 type="textarea"
+                value={adjustReason}
+                onChange={setAdjustReason}
                 placeholder="Укажите причину корректировки..."
               />
             </div>
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setBalanceModal(null)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleAdjustBalance}
+                disabled={adjustMutation.isPending}
+                type="button"
+              >
+                {adjustMutation.isPending && <Loader2 size={16} className={styles.spinner} />}
                 Применить
               </button>
             </div>

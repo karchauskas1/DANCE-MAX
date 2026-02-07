@@ -6,8 +6,9 @@ import {
   Plus,
   X,
   Inbox,
+  Loader2,
 } from 'lucide-react';
-import { useLessons, useDirections, useTeachers } from '../../api/queries';
+import { useLessons, useDirections, useTeachers, useCreateLesson, useDeleteLesson } from '../../api/queries';
 import { CalendarGrid } from '../components/CalendarGrid';
 import type { CalendarLesson } from '../components/CalendarGrid';
 import { FormField } from '../components/FormField';
@@ -27,9 +28,12 @@ export function ScheduleMgmt() {
   const { data: directionsData } = useDirections();
   const { data: teachersData } = useTeachers();
 
+  const createMutation = useCreateLesson();
+  const deleteMutation = useDeleteLesson();
+
   // Формируем опции из реальных данных
   const directionOptions = (directionsData ?? []).map((d) => ({
-    value: d.slug,
+    value: String(d.id),
     label: d.name,
   }));
 
@@ -37,6 +41,50 @@ export function ScheduleMgmt() {
     value: String(t.id),
     label: t.name,
   }));
+
+  // Поля формы
+  const [directionId, setDirectionId] = useState('');
+  const [teacherId, setTeacherId] = useState('');
+  const [date, setDate] = useState('');
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  const [level, setLevel] = useState('beginner');
+  const [maxStudents, setMaxStudents] = useState('');
+
+  function resetForm() {
+    setDirectionId('');
+    setTeacherId('');
+    setDate('');
+    setStartTime('');
+    setEndTime('');
+    setLevel('beginner');
+    setMaxStudents('');
+  }
+
+  function closeModal() {
+    setShowModal(false);
+    resetForm();
+  }
+
+  async function handleSubmit() {
+    const payload = {
+      direction_id: Number(directionId),
+      teacher_id: Number(teacherId),
+      date,
+      start_time: startTime,
+      end_time: endTime,
+      level,
+      max_spots: Number(maxStudents) || 12,
+    };
+
+    await createMutation.mutateAsync(payload);
+    closeModal();
+  }
+
+  async function handleLessonClick(lessonId: number) {
+    if (!window.confirm('Отменить это занятие?')) return;
+    await deleteMutation.mutateAsync({ id: lessonId });
+  }
 
   // Маппим Lesson[] -> CalendarLesson[]
   const calendarLessons: CalendarLesson[] = useMemo(() => {
@@ -52,6 +100,8 @@ export function ScheduleMgmt() {
       maxStudents: lesson.maxSpots,
     }));
   }, [lessonsData]);
+
+  const isSaving = createMutation.isPending;
 
   return (
     <div className={styles.page}>
@@ -103,20 +153,20 @@ export function ScheduleMgmt() {
           <CalendarGrid
             currentDate={currentDate}
             lessons={calendarLessons}
-            onLessonClick={() => {}}
+            onLessonClick={(lesson) => handleLessonClick(lesson.id)}
           />
         </div>
       )}
 
       {/* Modal -- bottom-sheet style on mobile */}
       {showModal && (
-        <div className={styles.modalBackdrop} onClick={() => setShowModal(false)}>
+        <div className={styles.modalBackdrop} onClick={closeModal}>
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h2 className={styles.modalTitle}>Создать занятие</h2>
               <button
                 className={styles.modalClose}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 <X size={20} />
@@ -127,27 +177,53 @@ export function ScheduleMgmt() {
                 <FormField
                   label="Направление"
                   type="select"
+                  value={directionId}
+                  onChange={setDirectionId}
                   options={directionOptions}
                   required
                 />
                 <FormField
                   label="Преподаватель"
                   type="select"
+                  value={teacherId}
+                  onChange={setTeacherId}
                   options={teacherOptions}
                   required
                 />
-                <FormField label="Дата" type="date" required />
-                <FormField label="Время начала" type="time" required />
-                <FormField label="Время окончания" type="time" required />
+                <FormField
+                  label="Дата"
+                  type="date"
+                  value={date}
+                  onChange={setDate}
+                  required
+                />
+                <FormField
+                  label="Время начала"
+                  type="time"
+                  value={startTime}
+                  onChange={setStartTime}
+                  required
+                />
+                <FormField
+                  label="Время окончания"
+                  type="time"
+                  value={endTime}
+                  onChange={setEndTime}
+                  required
+                />
                 <FormField
                   label="Уровень"
                   type="select"
+                  value={level}
+                  onChange={setLevel}
                   options={levelOptions}
                   required
                 />
                 <FormField
                   label="Макс. учеников"
                   type="number"
+                  value={maxStudents}
+                  onChange={setMaxStudents}
                   placeholder="12"
                   required
                 />
@@ -156,12 +232,18 @@ export function ScheduleMgmt() {
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 type="button"
               >
                 Отмена
               </button>
-              <button className={styles.submitBtn} type="button">
+              <button
+                className={styles.submitBtn}
+                onClick={handleSubmit}
+                disabled={isSaving}
+                type="button"
+              >
+                {isSaving && <Loader2 size={16} className={styles.spinner} />}
                 Создать
               </button>
             </div>

@@ -25,8 +25,20 @@ class Settings(BaseSettings):
     # URL фронтенда Telegram Web App
     TELEGRAM_WEBAPP_URL: str = "http://localhost:5173"
 
+    # URL бэкенда (для установки webhook Telegram)
+    BACKEND_URL: str = "http://localhost:8000"
+
     # Токен платёжного провайдера для Telegram Payments
     PAYMENT_PROVIDER_TOKEN: str = ""
+
+    # ID администраторов (через запятую: "308477378,123456789")
+    ADMIN_IDS: str = "308477378"
+
+    # Разрешённые origins для CORS (через запятую)
+    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000"
+
+    # Sentry DSN для мониторинга ошибок (пустая строка = отключён)
+    SENTRY_DSN: str = ""
 
     # JWT-настройки
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 дней — срок жизни токена

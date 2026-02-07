@@ -81,6 +81,7 @@ export function mapLesson(data: any): Lesson {
     isCancelled: data.is_cancelled ?? false,
     cancelReason: data.cancel_reason ?? undefined,
     isBooked: data.is_booked ?? false,
+    bookingId: data.booking_id ?? undefined,
   };
 }
 

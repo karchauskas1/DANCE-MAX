@@ -24,6 +24,7 @@ from app.schemas.booking import BookingCreateRequest, BookingResponse
 from app.schemas.direction import DirectionListResponse
 from app.schemas.lesson import LessonResponse
 from app.schemas.teacher import TeacherListResponse
+from app.services.notification import notify_booking_created, notify_booking_cancelled
 
 router = APIRouter(prefix="/bookings", tags=["bookings"])
 
@@ -157,6 +158,16 @@ async def create_booking(
 
     await db.flush()
 
+    # Уведомляем пользователя о записи через Telegram-бота
+    lesson_info = (
+        f"{lesson.direction.name}\n"
+        f"{lesson.date.isoformat()} {lesson.start_time.strftime('%H:%M')}"
+    )
+    await notify_booking_created(
+        user_telegram_id=user.telegram_id,
+        lesson_info=lesson_info,
+    )
+
     return _build_booking_response(booking, user.id)
 
 
@@ -220,6 +231,16 @@ async def cancel_booking(
     db.add(transaction)
 
     await db.flush()
+
+    # Уведомляем пользователя об отмене записи через Telegram-бота
+    lesson_info = (
+        f"{lesson.direction.name}\n"
+        f"{lesson.date.isoformat()} {lesson.start_time.strftime('%H:%M')}"
+    )
+    await notify_booking_cancelled(
+        user_telegram_id=user.telegram_id,
+        lesson_info=lesson_info,
+    )
 
     return _build_booking_response(booking, user.id)
 

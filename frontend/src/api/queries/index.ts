@@ -30,3 +30,51 @@ export type { PurchaseParams } from './payments';
 // Promos
 export { usePromotions, useValidatePromo } from './promos';
 export type { ValidatePromoParams, ValidatePromoResult } from './promos';
+
+// Admin
+export {
+  // Dashboard
+  useAdminDashboard,
+  // Students
+  useAdminStudents,
+  useAdjustBalance,
+  // Directions CRUD
+  useCreateDirection,
+  useUpdateDirection,
+  useDeleteDirection,
+  // Teachers CRUD
+  useCreateTeacher,
+  useUpdateTeacher,
+  useDeleteTeacher,
+  // Courses CRUD
+  useCreateCourse,
+  useUpdateCourse,
+  useDeleteCourse,
+  // Promos CRUD
+  useCreatePromo,
+  useUpdatePromo,
+  useDeletePromo,
+  // Subscriptions CRUD
+  useCreateSubscription,
+  useUpdateSubscription,
+  useDeleteSubscription,
+  // Lessons (Schedule) CRUD
+  useCreateLesson,
+  useUpdateLesson,
+  useDeleteLesson,
+  // Bookings
+  useMarkAttendance,
+  // Broadcast
+  useSendBroadcast,
+} from './admin';
+export type {
+  AdminDashboardStats,
+  AdminStudent,
+  DirectionPayload,
+  TeacherPayload,
+  CoursePayload,
+  PromoPayload,
+  SubscriptionPayload,
+  LessonPayload,
+  BroadcastPayload,
+} from './admin';
