@@ -1,0 +1,191 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+}
+
+/* -- Filters -- */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filterIcon {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.filtersScroll {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.filtersScroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filterBtn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filterBtn:hover {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.filterBtnActive {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+  border-color: var(--color-text);
+}
+
+.filterBtnActive:hover {
+  background: var(--color-text);
+  color: var(--color-text-inverse);
+}
+
+/* -- Table wrapper with horizontal scroll -- */
+.tableWrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -16px;
+  padding: 0 16px;
+}
+
+/* -- Direction badge -- */
+.directionBadge {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+/* -- Status badges -- */
+.badge {
+  display: inline-flex;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.badge_active {
+  color: var(--color-success);
+  background: var(--color-success-light);
+}
+
+.badge_cancelled {
+  color: var(--color-error);
+  background: var(--color-error-light);
+}
+
+.badge_attended {
+  color: var(--color-info);
+  background: var(--color-info-light);
+}
+
+.badge_missed {
+  color: var(--color-warning);
+  background: var(--color-warning-light);
+}
+
+/* -- Action buttons -- */
+.attendBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-success);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.attendBtn:hover {
+  background: var(--color-success-light);
+}
+
+.missBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  color: var(--color-error);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.missBtn:hover {
+  background: var(--color-error-light);
+}
+
+/* -- Empty / Loading states -- */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.loadingText {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}

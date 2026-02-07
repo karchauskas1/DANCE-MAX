@@ -1,0 +1,435 @@
+/* ===========================================
+   TeachersCRUD — Mobile-adapted (max-width 430px)
+   Uses frontend design tokens from variables.css
+   =========================================== */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.createBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  height: 36px;
+  padding: 0 var(--space-md);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.createBtn:active {
+  transform: scale(0.96);
+  background: var(--color-primary-dark);
+}
+
+/* -- Grid — single column on mobile -- */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* -- Card -- */
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  transition: all var(--transition-normal);
+}
+
+.card:active {
+  background: var(--color-surface-hover);
+}
+
+.cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.photoPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.photoInitials {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cardActions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.cardActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cardActionBtn:active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.cardActionBtnDanger {
+  composes: cardActionBtn;
+}
+
+.cardActionBtnDanger:active {
+  background: rgba(var(--color-error-rgb), 0.15);
+  color: var(--color-error);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.nameRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.cardName {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.inactiveBadge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background: var(--color-surface-elevated);
+}
+
+.experience {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.cardBio {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
+.cardFooter {
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--color-border);
+}
+
+.cardMeta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* -- Upload area -- */
+.uploadArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.uploadArea:active {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.03);
+}
+
+.uploadIcon {
+  color: var(--color-text-muted);
+}
+
+.uploadText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.uploadHint {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* -- Directions select -- */
+.directionsSelect {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.directionTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.directionTag {
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.directionTag:active {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+}
+
+.directionTagActive {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.08);
+}
+
+/* -- Modal — bottom-sheet on mobile -- */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal-backdrop);
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal {
+  z-index: var(--z-modal);
+  background: var(--color-bg);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  width: 100%;
+  max-width: 430px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-modal);
+  -webkit-overflow-scrolling: touch;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 1;
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.modalClose {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.modalClose:active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.modalBody {
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.modalFooter {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--color-border);
+  position: sticky;
+  bottom: 0;
+  background: var(--color-bg);
+}
+
+.cancelBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cancelBtn:active {
+  background: var(--color-surface-hover);
+  color: var(--color-text);
+}
+
+.submitBtn {
+  flex: 1;
+  height: 44px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text-inverse);
+  background: var(--color-primary);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  border: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.submitBtn:active {
+  background: var(--color-primary-dark);
+  transform: scale(0.98);
+}
+
+/* -- Empty / Loading states -- */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 16px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.emptyText {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.loadingText {
+  padding: 32px 16px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+}

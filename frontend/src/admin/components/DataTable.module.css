@@ -1,0 +1,245 @@
+/* ===========================================
+   DataTable — Mobile-adapted (max-width 430px)
+   Uses frontend design tokens from variables.css
+   =========================================== */
+
+.wrapper {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* -- Toolbar -- */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.searchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 10px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-md) 0 34px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  font-size: 14px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color var(--transition-fast);
+  -webkit-appearance: none;
+}
+
+.searchInput:focus {
+  border-color: var(--color-primary);
+}
+
+.searchInput::placeholder {
+  color: var(--color-text-muted);
+}
+
+.resultCount {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* -- Table -- */
+.tableScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+}
+
+.th {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted);
+  background: var(--color-surface-elevated);
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.thSortable {
+  cursor: pointer;
+  transition: color var(--transition-fast);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.thSortable:hover {
+  color: var(--color-text);
+}
+
+.thContent {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.sortIcon {
+  display: inline-flex;
+  color: var(--color-text-muted);
+}
+
+.tr {
+  border-bottom: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+}
+
+.tr:last-child {
+  border-bottom: none;
+}
+
+.tr:hover {
+  background: var(--color-surface-hover);
+}
+
+.trClickable {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.td {
+  padding: var(--space-sm) var(--space-md);
+  font-size: 13px;
+  color: var(--color-text);
+  vertical-align: middle;
+}
+
+.emptyCell {
+  padding: var(--space-3xl) var(--space-md);
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.actionsCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* -- Pagination -- */
+.pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.pageInfo {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.pageButtons {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.pageBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  background: var(--color-surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pageBtn:hover:not(:disabled) {
+  border-color: var(--color-border-hover);
+  color: var(--color-text);
+  background: var(--color-surface-hover);
+}
+
+.pageBtn:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.pageBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* -- Wider viewport adjustments -- */
+@media (min-width: 431px) {
+  .toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-lg) var(--space-xl);
+  }
+
+  .searchWrap {
+    width: 300px;
+  }
+
+  .searchInput {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .th {
+    padding: var(--space-md) var(--space-xl);
+    font-size: 12px;
+  }
+
+  .td {
+    padding: var(--space-md) var(--space-xl);
+    font-size: 14px;
+  }
+
+  .emptyCell {
+    padding: var(--space-4xl) var(--space-xl);
+  }
+
+  .pagination {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-xl);
+  }
+
+  .pageBtn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .pageButtons {
+    gap: var(--space-xs);
+  }
+}

@@ -1,0 +1,229 @@
+/* ===========================================
+   CalendarGrid — Mobile-adapted (max-width 430px)
+   Uses frontend design tokens from variables.css
+   =========================================== */
+
+.grid {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* -- Header -- */
+.headerScroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: 36px repeat(7, minmax(44px, 1fr));
+  min-width: 344px;
+  background: var(--color-surface-elevated);
+}
+
+.dayHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-sm) 0;
+  gap: 2px;
+}
+
+.dayHeaderToday .dayName {
+  color: var(--color-primary);
+}
+
+.dayName {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.dayNumber {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.dayNumberToday {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* -- Body -- */
+.bodyScroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: 480px;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 36px repeat(7, minmax(44px, 1fr));
+  min-width: 344px;
+}
+
+/* -- Time column -- */
+.timeCol {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeLabel {
+  height: 60px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: var(--space-xs);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+/* -- Day column -- */
+.dayColumn {
+  position: relative;
+  border-left: 1px solid var(--color-border);
+}
+
+.dayColumnToday {
+  background: rgba(var(--color-primary-rgb), 0.03);
+}
+
+.hourCell {
+  height: 60px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.hourCell:last-child {
+  border-bottom: none;
+}
+
+/* -- Lesson block -- */
+.lessonBlock {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  border-radius: var(--radius-xs);
+  padding: 2px 4px;
+  background: color-mix(in srgb, var(--lesson-color) 12%, transparent);
+  border-left: 3px solid var(--lesson-color);
+  cursor: pointer;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  text-align: left;
+  transition: background var(--transition-fast);
+  z-index: 1;
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.lessonBlock:hover {
+  background: color-mix(in srgb, var(--lesson-color) 20%, transparent);
+}
+
+.lessonBlock:active {
+  background: color-mix(in srgb, var(--lesson-color) 28%, transparent);
+}
+
+.lessonTitle {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lessonMeta {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 9px;
+  color: var(--color-text-secondary);
+}
+
+.lessonTeacher {
+  font-size: 9px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lessonCount {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+/* -- Wider viewport adjustments -- */
+@media (min-width: 431px) {
+  .header {
+    grid-template-columns: 60px repeat(7, 1fr);
+    min-width: auto;
+  }
+
+  .body {
+    grid-template-columns: 60px repeat(7, 1fr);
+    min-width: auto;
+  }
+
+  .bodyScroll {
+    max-height: 640px;
+  }
+
+  .dayName {
+    font-size: 12px;
+  }
+
+  .dayNumber {
+    font-size: 20px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .timeLabel {
+    font-size: 11px;
+  }
+
+  .lessonBlock {
+    left: 3px;
+    right: 3px;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  .lessonTitle {
+    font-size: 12px;
+  }
+
+  .lessonMeta {
+    font-size: 10px;
+    gap: 3px;
+  }
+
+  .lessonTeacher {
+    font-size: 10px;
+  }
+
+  .lessonCount {
+    font-size: 10px;
+  }
+}

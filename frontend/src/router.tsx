@@ -18,6 +18,19 @@ import History from './pages/History/History';
 import Payment from './pages/Payment/Payment';
 import About from './pages/About/About';
 
+import AdminGuard from './admin/components/AdminGuard';
+import AdminShell from './admin/components/AdminShell';
+import { Dashboard } from './admin/pages/Dashboard';
+import { ScheduleMgmt } from './admin/pages/ScheduleMgmt';
+import { Students } from './admin/pages/Students';
+import { Bookings as AdminBookings } from './admin/pages/Bookings';
+import { DirectionsCRUD } from './admin/pages/DirectionsCRUD';
+import { TeachersCRUD } from './admin/pages/TeachersCRUD';
+import { CoursesCRUD } from './admin/pages/CoursesCRUD';
+import { PromosCRUD } from './admin/pages/PromosCRUD';
+import { SubscriptionsCRUD } from './admin/pages/SubscriptionsCRUD';
+import { Broadcast } from './admin/pages/Broadcast';
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -39,6 +52,22 @@ export const router = createBrowserRouter([
       { path: 'history', element: <History /> },
       { path: 'payment', element: <Payment /> },
       { path: 'about', element: <About /> },
+    ],
+  },
+  {
+    path: '/admin',
+    element: <AdminGuard><AdminShell /></AdminGuard>,
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: 'schedule', element: <ScheduleMgmt /> },
+      { path: 'students', element: <Students /> },
+      { path: 'bookings', element: <AdminBookings /> },
+      { path: 'directions', element: <DirectionsCRUD /> },
+      { path: 'teachers', element: <TeachersCRUD /> },
+      { path: 'courses', element: <CoursesCRUD /> },
+      { path: 'promos', element: <PromosCRUD /> },
+      { path: 'subscriptions', element: <SubscriptionsCRUD /> },
+      { path: 'broadcast', element: <Broadcast /> },
     ],
   },
 ]);

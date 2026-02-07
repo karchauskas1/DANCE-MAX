@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Instagram, Clock, Heart } from 'lucide-react';
+import { MapPin, Phone, Instagram, Clock, Heart, Navigation } from 'lucide-react';
 import styles from './About.module.css';
 
 const containerVariants = {
@@ -19,7 +19,7 @@ const studioInfo = {
   name: 'Dance MAX',
   description:
     'Dance MAX -- это современная танцевальная студия в центре города. Мы предлагаем занятия по самым популярным направлениям для любого уровня подготовки. Наша миссия -- сделать танцы доступными и вдохновить каждого на движение.',
-  address: 'ул. Пушкина, д. 10, 2 этаж',
+  address: 'г. Москва, ул. Большая Дмитровка, д. 7/5, стр. 1',
   phone: '+7 (999) 123-45-67',
   instagram: '@dancemax_studio',
   workingHours: [
@@ -49,17 +49,30 @@ export default function About() {
         <p className={styles.description}>{studioInfo.description}</p>
       </motion.section>
 
-      {/* Address */}
+      {/* Address & Map */}
       <motion.section className={styles.section} variants={itemVariants}>
         <h2 className={styles.sectionTitle}>
           <MapPin size={18} className={styles.sectionIcon} />
-          Адрес
+          Как добраться
         </h2>
         <p className={styles.infoText}>{studioInfo.address}</p>
-        <div className={styles.mapPlaceholder}>
-          <MapPin size={24} className={styles.mapIcon} />
-          <span>Карта</span>
+        <div className={styles.mapWrapper}>
+          <iframe
+            className={styles.mapIframe}
+            src="https://yandex.ru/map-widget/v1/?pt=37.611914,55.762575&z=16&l=map"
+            allowFullScreen
+            title="Dance MAX на карте"
+          />
         </div>
+        <a
+          className={styles.directionsButton}
+          href="https://yandex.ru/maps/?rtext=~55.762575,37.611914&rtt=auto"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Navigation size={18} className={styles.directionsIcon} />
+          <span>Проложить маршрут</span>
+        </a>
       </motion.section>
 
       {/* Contacts */}

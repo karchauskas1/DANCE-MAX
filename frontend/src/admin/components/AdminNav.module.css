@@ -1,0 +1,124 @@
+/* ============================================
+   AdminNav — Horizontal scrollable pill tabs
+   ============================================ */
+
+.nav {
+  position: sticky;
+  top: 52px; /* directly below header */
+  z-index: calc(var(--z-nav) - 1);
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(
+    180deg,
+    rgba(14, 14, 16, 0.92) 0%,
+    rgba(10, 10, 12, 0.88) 100%
+  );
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  padding: var(--space-sm) var(--space-lg);
+
+  /* Hide scrollbar — all browsers */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.nav::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Inner track ensures flex sizing without collapsing */
+.track {
+  display: flex;
+  gap: 6px;
+  width: max-content;
+}
+
+/* ── Pill link ── */
+
+.pill {
+  text-decoration: none;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
+  outline: none;
+}
+
+.pill:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-primary);
+}
+
+.pillInner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* ── Active state: solid primary pill ── */
+
+.pillActive .pillInner {
+  background: var(--color-primary);
+  box-shadow:
+    0 2px 12px rgba(var(--color-primary-rgb), 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.pillActive .pillIcon {
+  color: #fff;
+}
+
+.pillActive .pillLabel {
+  color: #fff;
+  font-weight: 600;
+}
+
+/* ── Inactive state: translucent ghost pill ── */
+
+.pillInactive .pillInner {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.pillInactive .pillIcon {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.pillInactive .pillLabel {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.pillInactive:hover .pillInner {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.pillInactive:hover .pillIcon,
+.pillInactive:hover .pillLabel {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pillInactive:active .pillInner {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ── Icon & label typography ── */
+
+.pillIcon {
+  flex-shrink: 0;
+  transition: color var(--transition-fast);
+}
+
+.pillLabel {
+  font-family: var(--font-body);
+  font-size: 12px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  transition: color var(--transition-fast);
+}

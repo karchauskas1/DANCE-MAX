@@ -1,0 +1,176 @@
+/* ============================================
+   AdminShell — Mobile admin layout (max 430px)
+   ============================================ */
+
+.shell {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  position: relative;
+  overflow-x: hidden;
+  background: var(--color-bg);
+}
+
+/* ── Decorative header glow ── */
+
+.headerGlow {
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 180px;
+  height: 180px;
+  background: radial-gradient(
+    circle,
+    rgba(var(--color-primary-rgb), 0.18) 0%,
+    rgba(var(--color-primary-rgb), 0.04) 50%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Sticky dark top bar ── */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-nav);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 52px;
+  padding: 0 var(--space-lg);
+  background: linear-gradient(
+    180deg,
+    rgba(18, 18, 20, 0.97) 0%,
+    rgba(14, 14, 16, 0.95) 100%
+  );
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ── Back button ── */
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.75);
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.backBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.backBtn:active {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.backIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Title with shield badge ── */
+
+.titleGroup {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  justify-content: center;
+  /* Offset slightly left to visually center between back+avatar */
+  margin-left: -34px;
+  pointer-events: none;
+}
+
+.titleBadge {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.2px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* ── Small avatar ── */
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-primary-dark) 100%
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  user-select: none;
+  box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.35);
+}
+
+/* ── Content area ── */
+
+.content {
+  position: relative;
+  z-index: 1;
+  padding: var(--space-lg);
+  padding-bottom: calc(var(--space-4xl) + env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh - 52px - 48px);
+}
+
+/* ── Auth guard loading state ── */
+
+.guardLoading {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
+}
+
+.guardSpinner {
+  width: 28px;
+  height: 28px;
+  border: 2.5px solid rgba(255, 255, 255, 0.08);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: adminSpin 0.75s linear infinite;
+}
+
+@keyframes adminSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}

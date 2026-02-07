@@ -111,11 +111,11 @@ export default function Profile() {
       {/* Admin Panel Link */}
       {user?.isAdmin && (
         <motion.section className={styles.section} variants={itemVariants}>
-          <a href="https://admin-three-sooty-43.vercel.app" target="_blank" rel="noopener noreferrer" className={styles.linkItem} style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none', color: 'inherit' }}>
+          <Link to="/admin" className={styles.linkItem}>
             <Shield size={20} className={styles.linkIcon} />
             <span className={styles.linkLabel}>Админ-панель</span>
             <ChevronRight size={18} className={styles.linkArrow} />
-          </a>
+          </Link>
         </motion.section>
       )}
 

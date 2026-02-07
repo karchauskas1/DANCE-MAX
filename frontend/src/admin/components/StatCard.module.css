@@ -1,0 +1,104 @@
+/* ===========================================
+   StatCard — Mobile-adapted (max-width 430px)
+   Uses frontend design tokens from variables.css
+   =========================================== */
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  transition: all var(--transition-normal);
+  min-width: 0; /* Allow flex shrink in grid layouts */
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: var(--shadow-card);
+}
+
+.card:active {
+  transform: scale(0.98);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.trendUp {
+  color: var(--color-success);
+  background: rgba(var(--color-success-rgb), 0.12);
+}
+
+.trendDown {
+  color: var(--color-error);
+  background: rgba(var(--color-error-rgb), 0.12);
+}
+
+.value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+
+.label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* -- Wider viewport adjustments -- */
+@media (min-width: 431px) {
+  .card {
+    padding: var(--space-xl);
+    gap: var(--space-md);
+  }
+
+  .iconWrap {
+    width: 40px;
+    height: 40px;
+  }
+
+  .trend {
+    font-size: 12px;
+  }
+
+  .value {
+    font-size: 28px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+}
