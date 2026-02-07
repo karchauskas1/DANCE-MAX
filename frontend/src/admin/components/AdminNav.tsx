@@ -29,10 +29,10 @@ const navItems: AdminNavItem[] = [
   { label: 'Преподы',       path: '/admin/teachers',     icon: Users },
   { label: 'Курсы',         path: '/admin/courses',      icon: GraduationCap },
   { label: 'Абонементы',    path: '/admin/subscriptions', icon: CreditCard },
-  { label: 'Акции',         path: '/admin/promotions',   icon: Percent },
+  { label: 'Акции',         path: '/admin/promos',       icon: Percent },
   { label: 'Ученики',       path: '/admin/students',     icon: UserCheck },
   { label: 'Записи',        path: '/admin/bookings',     icon: ClipboardList },
-  { label: 'Рассылки',      path: '/admin/broadcasts',   icon: Megaphone },
+  { label: 'Рассылки',      path: '/admin/broadcast',    icon: Megaphone },
 ];
 
 /**

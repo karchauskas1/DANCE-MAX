@@ -1,16 +1,9 @@
-import { Bell } from 'lucide-react';
-import { useAuthStore } from '../../store/auth';
+import { Bell, UserCircle } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import styles from './Header.module.css';
 
-function getInitials(firstName?: string, lastName?: string): string {
-  const f = firstName?.charAt(0) ?? '';
-  const l = lastName?.charAt(0) ?? '';
-  return (f + l) || 'DM';
-}
-
 export default function Header() {
-  const user = useAuthStore((s) => s.user);
-  const initials = getInitials(user?.firstName, user?.lastName);
+  const navigate = useNavigate();
 
   return (
     <header className={styles.header}>
@@ -58,7 +51,13 @@ export default function Header() {
           <Bell size={20} strokeWidth={1.8} />
           <span className={styles.notifDot} />
         </button>
-        <div className={styles.avatar}>{initials}</div>
+        <button
+          className={styles.profileBtn}
+          aria-label="Профиль"
+          onClick={() => navigate('/profile')}
+        >
+          <UserCircle size={26} strokeWidth={1.5} />
+        </button>
       </div>
     </header>
   );
