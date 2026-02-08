@@ -72,7 +72,7 @@ async def telegram_auth(
             is_admin=telegram_id in ADMIN_IDS,
         )
         db.add(user)
-        await db.flush()
+        await db.commit()
     else:
         # Существующий пользователь — обновляем данные профиля из Telegram
         user.first_name = first_name
@@ -80,7 +80,7 @@ async def telegram_auth(
         user.username = username
         if photo_url:
             user.photo_url = photo_url
-        await db.flush()
+        await db.commit()
 
     # Шаг 4: Генерируем JWT-токен (sub = telegram_id)
     token = create_access_token(data={"sub": str(telegram_id)})

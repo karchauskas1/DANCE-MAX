@@ -156,7 +156,7 @@ async def create_booking(
     )
     db.add(transaction)
 
-    await db.flush()
+    await db.commit()
 
     # Уведомляем пользователя о записи через Telegram-бота
     lesson_info = (
@@ -230,7 +230,7 @@ async def cancel_booking(
     )
     db.add(transaction)
 
-    await db.flush()
+    await db.commit()
 
     # Уведомляем пользователя об отмене записи через Telegram-бота
     lesson_info = (

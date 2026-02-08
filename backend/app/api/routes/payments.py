@@ -142,7 +142,7 @@ async def create_payment(
     )
     db.add(transaction)
 
-    await db.flush()
+    await db.commit()
 
     return SubscriptionResponse(
         id=subscription.id,

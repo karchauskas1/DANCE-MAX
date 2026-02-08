@@ -51,6 +51,6 @@ async def deactivate_expired_subscriptions(db: AsyncSession) -> int:
         .values(is_active=False)
     )
     await db.execute(stmt)
-    await db.flush()
+    await db.commit()
 
     return count
