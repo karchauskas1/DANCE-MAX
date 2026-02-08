@@ -3,6 +3,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import AppShell from './components/layout/AppShell';
 import { ErrorBoundaryFallback } from './components/ErrorBoundary';
 
+import Onboarding from './pages/Onboarding/Onboarding';
 import Home from './pages/Home/Home';
 import Schedule from './pages/Schedule/Schedule';
 import Lesson from './pages/Lesson/Lesson';
@@ -74,6 +75,10 @@ function AdminSkeleton() {
 }
 
 export const router = createBrowserRouter([
+  {
+    path: '/onboarding',
+    element: <Onboarding />,
+  },
   {
     path: '/',
     element: <AppShell />,

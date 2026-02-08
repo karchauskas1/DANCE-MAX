@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, Navigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import Header from './Header';
 import BottomNav from './BottomNav';
@@ -14,6 +14,12 @@ const pageVariants = {
 export default function AppShell() {
   const location = useLocation();
   const { isLoading: authLoading } = useAuth();
+
+  const hasOnboarded = localStorage.getItem('dancemax_onboarded');
+
+  if (!authLoading && !hasOnboarded) {
+    return <Navigate to="/onboarding" replace />;
+  }
 
   if (authLoading) {
     return (

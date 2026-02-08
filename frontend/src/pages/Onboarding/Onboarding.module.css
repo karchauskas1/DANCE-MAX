@@ -1,0 +1,469 @@
+.container {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 1000;
+  overflow: hidden;
+  touch-action: pan-y;
+}
+
+/* --- Safe area wrapper --- */
+.safeArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+.safeArea:first-child {
+  padding-top: 60px;
+}
+
+/* --- Content section (top) --- */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  flex: 1;
+  min-height: 0;
+}
+
+.textSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFF5C8;
+  text-align: center;
+  letter-spacing: -0.8px;
+  line-height: 1.2;
+}
+
+.titleLarge {
+  font-size: 36px;
+  letter-spacing: 0;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 245, 200, 0.8);
+  text-align: center;
+}
+
+.description {
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(255, 245, 200, 0.6);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* --- Welcome screen (screen 1) --- */
+.welcomeContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+  justify-content: center;
+}
+
+.welcomeHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+/* --- Visual section (screens 2-5) --- */
+.visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-height: 280px;
+  justify-content: center;
+}
+
+/* --- Schedule card (screen 2) --- */
+.scheduleCard {
+  width: 100%;
+  background: #1A1A1E;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.scheduleCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.scheduleCardInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scheduleDate {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: #FFF5C8;
+}
+
+.scheduleClassName {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 600;
+  color: #FFF5C8;
+}
+
+.scheduleIcon {
+  color: #8D1F1F;
+}
+
+.scheduleCardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scheduleInstructor {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(255, 245, 200, 0.6);
+}
+
+.scheduleSpots {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #32D583;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.bookButton {
+  width: 100%;
+  height: 44px;
+  background: #8D1F1F;
+  border: none;
+  border-radius: 12px;
+  color: #FFF5C8;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- Subscription cards stack (screen 3) --- */
+.cardsStack {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  height: 240px;
+}
+
+.cardBack {
+  position: absolute;
+  width: 100%;
+  height: 180px;
+  background: #0D0D0D;
+  border-radius: 20px;
+  top: 0;
+  left: 0;
+  transform: rotate(-3deg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.37);
+}
+
+.cardMiddle {
+  position: absolute;
+  width: 100%;
+  height: 180px;
+  background: #1A1A1E;
+  border-radius: 20px;
+  top: -10px;
+  left: 0;
+  transform: rotate(2deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.31);
+}
+
+.cardFront {
+  position: absolute;
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #8D1F1F 0%, #4D1211 100%);
+  border-radius: 20px;
+  top: 20px;
+  left: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 8px 24px rgba(141, 31, 31, 0.25);
+}
+
+.popularBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.cardTitle {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cardSubtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.cardPrice {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  color: #FFF5C8;
+}
+
+/* --- Instructors (screen 4) --- */
+.instructorsRow {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(141, 31, 31, 0.19);
+}
+
+.avatarPrimary {
+  background: linear-gradient(135deg, #8D1F1F 0%, #4D1211 100%);
+}
+
+.avatarDark {
+  background: linear-gradient(135deg, #4D1211 0%, #000 100%);
+}
+
+.avatarText {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 600;
+  color: #FFF5C8;
+}
+
+.tagsRow {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 16px;
+  background: #8D1F1F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF5C8;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* --- Add to home screen (screen 5) --- */
+.iconRow {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  justify-content: center;
+}
+
+.appIcon {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #8D1F1F 0%, #4D1211 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(141, 31, 31, 0.25);
+}
+
+.appIconText {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 700;
+  color: #FFF5C8;
+}
+
+.arrowIcon {
+  color: rgba(255, 245, 200, 0.4);
+}
+
+.phoneScreen {
+  width: 120px;
+  height: 160px;
+  background: #1A1A1E;
+  border-radius: 16px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.appsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.appDot {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+}
+
+.appDotDanceMax {
+  background: #8D1F1F;
+  box-shadow: 0 2px 4px rgba(141, 31, 31, 0.37);
+}
+
+.stepsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.stepNumber {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 12px;
+  background: #4D1211;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFF5C8;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.stepText {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(255, 245, 200, 0.6);
+}
+
+/* --- Bottom section --- */
+.bottomSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.primaryButton {
+  width: 100%;
+  height: 56px;
+  border: none;
+  border-radius: 16px;
+  background: #8D1F1F;
+  color: #FFF5C8;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.primaryButton:active {
+  transform: scale(0.98);
+}
+
+.skipLink {
+  background: none;
+  border: none;
+  color: rgba(255, 245, 200, 0.4);
+  font-family: var(--font-body);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+/* --- Indicators --- */
+.indicators {
+  display: flex;
+  gap: 8px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 245, 200, 0.2);
+  transition: background 300ms ease;
+}
+
+.dotActive {
+  background: #FFF5C8;
+}
+
+/* --- Slide animation wrapper --- */
+.slide {
+  position: absolute;
+  inset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton:active {
+    transform: none;
+  }
+}
