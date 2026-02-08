@@ -500,6 +500,7 @@ export function useSendBroadcast() {
         message: payload.message,
         target: payload.audience,
         direction_id: payload.direction_id,
+        schedule_at: payload.schedule_at,
       });
     },
   });

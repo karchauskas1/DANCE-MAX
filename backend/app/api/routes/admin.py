@@ -8,9 +8,10 @@
 - Управление учениками
 - Отметка посещений
 - Деактивация просроченных подписок
-- Рассылка (заглушка)
+- Рассылка
 """
 
+import logging
 from datetime import date, datetime, time, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
@@ -38,6 +39,8 @@ from app.models.user import User
 from app.schemas.user import UserResponse
 from app.services.subscription_deactivation import deactivate_expired_subscriptions
 from app.services.notification import notify_lesson_cancelled
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -99,6 +102,7 @@ class BroadcastRequest(BaseModel):
     message: str
     target: str = "all"  # all / active_subs / by_direction
     direction_id: int | None = None  # обязателен при target="by_direction"
+    schedule_at: str | None = None  # ISO datetime для отложенной отправки (пока не реализовано)
 
 
 class BroadcastResponse(BaseModel):
@@ -133,11 +137,11 @@ class StudentDetailResponse(BaseModel):
 class DirectionCreateRequest(BaseModel):
     """Запрос на создание направления."""
     name: str
-    slug: str
+    slug: str | None = None
     description: str = ""
     short_description: str = ""
     image_url: str | None = None
-    color: str = "#FF5722"
+    color: str = "#8D1F1F"
     icon: str = "music"
     is_active: bool = True
     sort_order: int = 0
@@ -370,7 +374,7 @@ async def create_lesson(
         level=body.level,
     )
     db.add(lesson)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": lesson.id,
@@ -430,7 +434,7 @@ async def update_lesson(
     if body.level is not None:
         lesson.level = body.level
 
-    await db.flush()
+    await db.commit()
 
     return {"id": lesson.id, "message": "Занятие обновлено"}
 
@@ -499,7 +503,7 @@ async def cancel_lesson(
                 db.add(transaction)
                 refunded_count += 1
 
-    await db.flush()
+    await db.commit()
 
     # Уведомляем пользователей об отмене занятия через Telegram-бота
     lesson_info = f"{lesson.date.isoformat()} {lesson.start_time.strftime('%H:%M')}"
@@ -643,7 +647,7 @@ async def adjust_balance(
     )
     db.add(transaction)
 
-    await db.flush()
+    await db.commit()
 
     return {
         "student_id": student.id,
@@ -682,7 +686,7 @@ async def mark_attendance(
 
     booking.status = "attended"
 
-    await db.flush()
+    await db.commit()
 
     return {
         "booking_id": booking.id,
@@ -737,6 +741,10 @@ async def send_broadcast(
     telegram_ids = [row[0] for row in result.all()]
     total_users = len(telegram_ids)
 
+    # TODO: schedule_at — отложенная отправка (Celery task)
+    if body.schedule_at:
+        logger.info("Запланированная рассылка на %s (пока отправляем сразу)", body.schedule_at)
+
     # Отправляем сообщение каждому пользователю
     sent = 0
     failed = 0
@@ -745,7 +753,7 @@ async def send_broadcast(
             await tg_bot.send_message(chat_id=tg_id, text=body.message)
             sent += 1
         except Exception:
-            # Пользователь заблокировал бота, удалил аккаунт и т.д.
+            logger.warning("Не удалось отправить сообщение пользователю tg_id=%s", tg_id, exc_info=True)
             failed += 1
 
     return BroadcastResponse(
@@ -775,19 +783,22 @@ async def create_direction(
     Создать новое танцевальное направление.
     Проверяет уникальность slug перед созданием.
     """
+    # Генерируем slug из имени, если не указан
+    slug = body.slug or body.name.lower().replace(" ", "-")
+
     # Проверяем уникальность slug
     existing = await db.execute(
-        select(Direction).where(Direction.slug == body.slug)
+        select(Direction).where(Direction.slug == slug)
     )
     if existing.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Направление со slug '{body.slug}' уже существует",
+            detail=f"Направление со slug '{slug}' уже существует",
         )
 
     direction = Direction(
         name=body.name,
-        slug=body.slug,
+        slug=slug,
         description=body.description,
         short_description=body.short_description,
         image_url=body.image_url,
@@ -797,7 +808,7 @@ async def create_direction(
         sort_order=body.sort_order,
     )
     db.add(direction)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": direction.id,
@@ -844,7 +855,7 @@ async def update_direction(
     for field, value in update_data.items():
         setattr(direction, field, value)
 
-    await db.flush()
+    await db.commit()
 
     return {"id": direction.id, "message": "Направление обновлено"}
 
@@ -871,7 +882,7 @@ async def delete_direction(
         )
 
     direction.is_active = False
-    await db.flush()
+    await db.commit()
 
     return {"id": direction.id, "message": "Направление деактивировано"}
 
@@ -929,7 +940,7 @@ async def create_teacher(
         teacher.directions = directions
 
     db.add(teacher)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": teacher.id,
@@ -994,7 +1005,7 @@ async def update_teacher(
             )
         teacher.directions = directions
 
-    await db.flush()
+    await db.commit()
 
     return {"id": teacher.id, "message": "Преподаватель обновлён"}
 
@@ -1020,7 +1031,7 @@ async def delete_teacher(
         )
 
     teacher.is_active = False
-    await db.flush()
+    await db.commit()
 
     return {"id": teacher.id, "message": "Преподаватель деактивирован"}
 
@@ -1063,7 +1074,7 @@ async def create_special_course(
         is_active=body.is_active,
     )
     db.add(course)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": course.id,
@@ -1111,7 +1122,7 @@ async def update_special_course(
     for field, value in update_data.items():
         setattr(course, field, value)
 
-    await db.flush()
+    await db.commit()
 
     return {"id": course.id, "message": "Спецкурс обновлён"}
 
@@ -1139,7 +1150,7 @@ async def delete_special_course(
         )
 
     course.is_active = False
-    await db.flush()
+    await db.commit()
 
     return {"id": course.id, "message": "Спецкурс деактивирован"}
 
@@ -1201,7 +1212,7 @@ async def create_promotion(
         is_active=body.is_active,
     )
     db.add(promotion)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": promotion.id,
@@ -1282,7 +1293,7 @@ async def update_promotion(
     for field, value in update_data.items():
         setattr(promotion, field, value)
 
-    await db.flush()
+    await db.commit()
 
     return {"id": promotion.id, "message": "Акция обновлена"}
 
@@ -1310,7 +1321,7 @@ async def delete_promotion(
         )
 
     promotion.is_active = False
-    await db.flush()
+    await db.commit()
 
     return {"id": promotion.id, "message": "Акция деактивирована"}
 
@@ -1343,7 +1354,7 @@ async def create_subscription_plan(
         sort_order=body.sort_order,
     )
     db.add(plan)
-    await db.flush()
+    await db.commit()
 
     return {
         "id": plan.id,
@@ -1380,7 +1391,7 @@ async def update_subscription_plan(
     for field, value in update_data.items():
         setattr(plan, field, value)
 
-    await db.flush()
+    await db.commit()
 
     return {"id": plan.id, "message": "Тарифный план обновлён"}
 
@@ -1409,7 +1420,7 @@ async def delete_subscription_plan(
         )
 
     plan.is_active = False
-    await db.flush()
+    await db.commit()
 
     return {"id": plan.id, "message": "Тарифный план деактивирован"}
 
