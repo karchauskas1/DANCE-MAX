@@ -89,7 +89,7 @@
   height: 48px;
   margin-top: var(--space-md);
   background: var(--color-accent);
-  color: #fff;
+  color: var(--color-cream);
   border: none;
   border-radius: var(--radius-md);
   font-family: var(--font-body);
@@ -104,7 +104,7 @@
 .directionsButton:hover {
   background: var(--color-accent-hover, var(--color-accent));
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(255, 92, 53, 0.3);
+  box-shadow: 0 6px 20px rgba(var(--color-primary-rgb), 0.4);
 }
 
 .directionsButton:active {

@@ -73,7 +73,7 @@
 
 .backBtn:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  color: var(--color-cream);
 }
 
 .backBtn:active {
@@ -108,7 +108,7 @@
   font-family: var(--font-display);
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-cream);
   letter-spacing: -0.2px;
   white-space: nowrap;
   margin: 0;
@@ -131,7 +131,7 @@
   font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-cream);
   flex-shrink: 0;
   user-select: none;
   box-shadow: 0 2px 10px rgba(var(--color-primary-rgb), 0.35);

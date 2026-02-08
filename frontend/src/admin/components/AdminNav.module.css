@@ -70,11 +70,11 @@
 }
 
 .pillActive .pillIcon {
-  color: #fff;
+  color: var(--color-cream);
 }
 
 .pillActive .pillLabel {
-  color: #fff;
+  color: var(--color-cream);
   font-weight: 600;
 }
 

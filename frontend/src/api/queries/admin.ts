@@ -73,7 +73,7 @@ export function useAdminDashboard() {
           (l: any) => ({
             id: l.id,
             directionName: l.direction_name ?? '—',
-            directionColor: l.direction_color ?? '#FF5C35',
+            directionColor: l.direction_color ?? '#8D1F1F',
             teacherName: l.teacher_name ?? '—',
             startTime: l.start_time ?? '—',
             currentSpots: l.current_spots ?? 0,

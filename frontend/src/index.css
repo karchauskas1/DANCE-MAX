@@ -14,8 +14,8 @@ html {
 
 body {
   font-family: 'Outfit', sans-serif;
-  background: #0a0a0c;
-  color: #fff;
+  background: var(--color-bg, #000000);
+  color: var(--color-text, #FFF5C8);
   min-height: 100dvh;
   overflow-x: hidden;
 }

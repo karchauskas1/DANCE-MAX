@@ -111,7 +111,7 @@ export function Dashboard() {
               <div key={lesson.id} className={styles.lessonRow}>
                 <div
                   className={styles.lessonColor}
-                  style={{ background: lesson.direction?.color || '#FF5C35' }}
+                  style={{ background: lesson.direction?.color || '#8D1F1F' }}
                 />
                 <div className={styles.lessonTime}>
                   <Clock size={13} />

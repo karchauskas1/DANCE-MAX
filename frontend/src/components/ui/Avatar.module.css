@@ -52,7 +52,7 @@
     var(--color-primary) 0%,
     var(--color-primary-light) 100%
   );
-  color: #fff;
+  color: var(--color-cream);
   font-family: var(--font-body);
   font-weight: 700;
   letter-spacing: 0.5px;

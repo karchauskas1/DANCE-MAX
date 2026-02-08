@@ -299,7 +299,7 @@
 
 .phoneHeader {
   background: #075e54;
-  color: #fff;
+  color: var(--color-cream);
   padding: var(--space-md) var(--space-lg);
   font-size: 14px;
   font-weight: 600;

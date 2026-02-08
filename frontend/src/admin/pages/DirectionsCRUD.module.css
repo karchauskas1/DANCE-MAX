@@ -226,7 +226,7 @@
 .iconOptionActive {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background: rgba(255, 92, 53, 0.05);
+  background: rgba(var(--color-primary-rgb), 0.05);
 }
 
 /* -- Modal: bottom-sheet on mobile -- */

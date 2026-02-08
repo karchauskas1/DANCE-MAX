@@ -28,7 +28,7 @@ export function DirectionsCRUD() {
   const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('flame');
-  const [selectedColor, setSelectedColor] = useState('#FF5C35');
+  const [selectedColor, setSelectedColor] = useState('#8D1F1F');
 
   // Заполняем форму при открытии редактирования
   useEffect(() => {
@@ -46,7 +46,7 @@ export function DirectionsCRUD() {
     setSlug('');
     setDescription('');
     setSelectedIcon('flame');
-    setSelectedColor('#FF5C35');
+    setSelectedColor('#8D1F1F');
   }
 
   function openCreate() {

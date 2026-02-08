@@ -77,10 +77,10 @@ export function FormField({
             id={id}
             disabled={disabled}
             className={styles.colorInput}
-            value={String(value ?? '#FF5C35')}
+            value={String(value ?? '#8D1F1F')}
             onChange={(e) => onChange?.(e.target.value)}
           />
-          <span className={styles.colorValue}>{String(value ?? '#FF5C35')}</span>
+          <span className={styles.colorValue}>{String(value ?? '#8D1F1F')}</span>
         </div>
       );
     }

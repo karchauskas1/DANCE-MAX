@@ -59,7 +59,7 @@
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  color: #fff;
+  color: var(--color-cream);
   background: linear-gradient(
     135deg,
     var(--color-primary) 0%,

@@ -58,7 +58,7 @@
 
 .dayNumberToday {
   background: var(--color-primary);
-  color: #fff;
+  color: var(--color-cream);
 }
 
 /* -- Body -- */

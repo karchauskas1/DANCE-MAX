@@ -95,7 +95,7 @@ export function ScheduleMgmt() {
       startTime: lesson.startTime,
       endTime: lesson.endTime,
       date: new Date(lesson.date),
-      color: lesson.direction?.color ?? '#FF5C35',
+      color: lesson.direction?.color ?? '#8D1F1F',
       studentsCount: lesson.currentSpots,
       maxStudents: lesson.maxSpots,
     }));
