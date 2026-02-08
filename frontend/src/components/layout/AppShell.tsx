@@ -15,7 +15,7 @@ export default function AppShell() {
   const location = useLocation();
   const { isLoading: authLoading } = useAuth();
 
-  const hasOnboarded = localStorage.getItem('dancemax_onboarded');
+  const hasOnboarded = sessionStorage.getItem('dancemax_onboarded');
 
   if (!authLoading && !hasOnboarded) {
     return <Navigate to="/onboarding" replace />;

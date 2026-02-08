@@ -38,7 +38,7 @@ export default function Onboarding() {
   );
 
   function complete() {
-    localStorage.setItem('dancemax_onboarded', '1');
+    sessionStorage.setItem('dancemax_onboarded', '1');
     navigate('/', { replace: true });
   }
 
