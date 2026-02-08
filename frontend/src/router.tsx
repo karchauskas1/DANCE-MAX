@@ -44,7 +44,7 @@ function AdminSkeleton() {
           height: 24,
           width: 160,
           borderRadius: 8,
-          background: 'var(--color-gray-200, #E5E5E5)',
+          background: '#222',
           marginBottom: 20,
           animation: 'pulse 1.5s ease-in-out infinite',
         }}
@@ -54,7 +54,7 @@ function AdminSkeleton() {
           height: 14,
           width: 100,
           borderRadius: 6,
-          background: 'var(--color-gray-100, #F5F5F5)',
+          background: '#1a1a1a',
           marginBottom: 28,
         }}
       />
@@ -64,7 +64,7 @@ function AdminSkeleton() {
           style={{
             height: 80,
             borderRadius: 12,
-            background: 'var(--color-gray-100, #F5F5F5)',
+            background: '#1a1a1a',
             marginBottom: 12,
           }}
         />
