@@ -28,6 +28,7 @@ export function DirectionsCRUD() {
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('flame');
   const [selectedColor, setSelectedColor] = useState('#8D1F1F');
+  const [submitError, setSubmitError] = useState('');
 
   // Заполняем форму при открытии редактирования
   useEffect(() => {
@@ -44,6 +45,7 @@ export function DirectionsCRUD() {
     setDescription('');
     setSelectedIcon('flame');
     setSelectedColor('#8D1F1F');
+    setSubmitError('');
   }
 
   function openCreate() {
@@ -64,6 +66,7 @@ export function DirectionsCRUD() {
   }
 
   async function handleSubmit() {
+    setSubmitError('');
     const payload = {
       name,
       slug: name.toLowerCase().replace(/\s+/g, '-'),
@@ -72,12 +75,17 @@ export function DirectionsCRUD() {
       color: selectedColor,
     };
 
-    if (editItem) {
-      await updateMutation.mutateAsync({ id: editItem.id, payload });
-    } else {
-      await createMutation.mutateAsync(payload);
+    try {
+      if (editItem) {
+        await updateMutation.mutateAsync({ id: editItem.id, payload });
+      } else {
+        await createMutation.mutateAsync(payload);
+      }
+      closeModal();
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Произошла ошибка';
+      setSubmitError(message);
     }
-    closeModal();
   }
 
   async function handleDelete(dir: Direction) {
@@ -212,6 +220,9 @@ export function DirectionsCRUD() {
                 </div>
               </div>
             </div>
+            {submitError && (
+              <div className={styles.errorBanner}>{submitError}</div>
+            )}
             <div className={styles.modalFooter}>
               <button
                 className={styles.cancelBtn}
