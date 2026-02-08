@@ -44,7 +44,7 @@ export default function Onboarding() {
 
   function handleAddToHome() {
     // Telegram WebApp API for adding to home screen
-    const tg = (window as Record<string, unknown>).Telegram as
+    const tg = (window as unknown as Record<string, unknown>).Telegram as
       | { WebApp?: { addToHomeScreen?: () => void } }
       | undefined;
     if (tg?.WebApp?.addToHomeScreen) {
