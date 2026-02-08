@@ -25,7 +25,6 @@ export function DirectionsCRUD() {
 
   // Поля формы
   const [name, setName] = useState('');
-  const [slug, setSlug] = useState('');
   const [description, setDescription] = useState('');
   const [selectedIcon, setSelectedIcon] = useState('flame');
   const [selectedColor, setSelectedColor] = useState('#8D1F1F');
@@ -34,7 +33,6 @@ export function DirectionsCRUD() {
   useEffect(() => {
     if (editItem) {
       setName(editItem.name);
-      setSlug(editItem.slug);
       setDescription(editItem.description);
       setSelectedIcon(editItem.icon);
       setSelectedColor(editItem.color);
@@ -43,7 +41,6 @@ export function DirectionsCRUD() {
 
   function resetForm() {
     setName('');
-    setSlug('');
     setDescription('');
     setSelectedIcon('flame');
     setSelectedColor('#8D1F1F');
@@ -69,7 +66,7 @@ export function DirectionsCRUD() {
   async function handleSubmit() {
     const payload = {
       name,
-      slug,
+      slug: name.toLowerCase().replace(/\s+/g, '-'),
       description,
       icon: selectedIcon,
       color: selectedColor,
@@ -183,14 +180,6 @@ export function DirectionsCRUD() {
                 value={name}
                 onChange={setName}
                 placeholder="Бачата"
-                required
-              />
-              <FormField
-                label="Slug"
-                type="text"
-                value={slug}
-                onChange={setSlug}
-                placeholder="bachata"
                 required
               />
               <FormField
