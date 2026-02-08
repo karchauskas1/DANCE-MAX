@@ -12,12 +12,12 @@
   --color-secondary: #4D1211;
 
   --color-bg: #000000;
-  --color-surface: rgba(141, 31, 31, 0.1);
-  --color-surface-elevated: rgba(141, 31, 31, 0.16);
-  --color-surface-hover: rgba(141, 31, 31, 0.22);
+  --color-surface: rgba(141, 31, 31, 0.22);
+  --color-surface-elevated: rgba(141, 31, 31, 0.30);
+  --color-surface-hover: rgba(141, 31, 31, 0.38);
 
-  --color-border: rgba(255, 245, 200, 0.08);
-  --color-border-hover: rgba(255, 245, 200, 0.16);
+  --color-border: rgba(255, 245, 200, 0.12);
+  --color-border-hover: rgba(255, 245, 200, 0.22);
 
   --color-text: #FFF5C8;
   --color-text-secondary: rgba(255, 245, 200, 0.6);
