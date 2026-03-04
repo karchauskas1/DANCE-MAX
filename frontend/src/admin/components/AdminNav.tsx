@@ -2,16 +2,9 @@ import { useRef, useEffect } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
-  LayoutDashboard,
   CalendarDays,
-  Compass,
-  Users,
-  GraduationCap,
-  CreditCard,
-  Percent,
   UserCheck,
   ClipboardList,
-  Megaphone,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import styles from './AdminNav.module.css';
@@ -23,16 +16,9 @@ interface AdminNavItem {
 }
 
 const navItems: AdminNavItem[] = [
-  { label: 'Главная',       path: '/admin',              icon: LayoutDashboard },
-  { label: 'Расписание',    path: '/admin/schedule',     icon: CalendarDays },
-  { label: 'Направления',   path: '/admin/directions',   icon: Compass },
-  { label: 'Преподы',       path: '/admin/teachers',     icon: Users },
-  { label: 'Курсы',         path: '/admin/courses',      icon: GraduationCap },
-  { label: 'Абонементы',    path: '/admin/subscriptions', icon: CreditCard },
-  { label: 'Акции',         path: '/admin/promos',       icon: Percent },
+  { label: 'Расписание',    path: '/admin',              icon: CalendarDays },
   { label: 'Ученики',       path: '/admin/students',     icon: UserCheck },
   { label: 'Записи',        path: '/admin/bookings',     icon: ClipboardList },
-  { label: 'Рассылки',      path: '/admin/broadcast',    icon: Megaphone },
 ];
 
 /**

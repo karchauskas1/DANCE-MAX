@@ -25,16 +25,9 @@ import AdminGuard from './admin/components/AdminGuard';
 import AdminShell from './admin/components/AdminShell';
 
 // ---- Lazy-loaded admin pages (bundle splitting) ----
-const Dashboard = lazy(() => import('./admin/pages/Dashboard').then(m => ({ default: m.Dashboard })));
 const ScheduleMgmt = lazy(() => import('./admin/pages/ScheduleMgmt').then(m => ({ default: m.ScheduleMgmt })));
 const Students = lazy(() => import('./admin/pages/Students').then(m => ({ default: m.Students })));
 const AdminBookings = lazy(() => import('./admin/pages/Bookings').then(m => ({ default: m.Bookings })));
-const DirectionsCRUD = lazy(() => import('./admin/pages/DirectionsCRUD').then(m => ({ default: m.DirectionsCRUD })));
-const TeachersCRUD = lazy(() => import('./admin/pages/TeachersCRUD').then(m => ({ default: m.TeachersCRUD })));
-const CoursesCRUD = lazy(() => import('./admin/pages/CoursesCRUD').then(m => ({ default: m.CoursesCRUD })));
-const PromosCRUD = lazy(() => import('./admin/pages/PromosCRUD').then(m => ({ default: m.PromosCRUD })));
-const SubscriptionsCRUD = lazy(() => import('./admin/pages/SubscriptionsCRUD').then(m => ({ default: m.SubscriptionsCRUD })));
-const Broadcast = lazy(() => import('./admin/pages/Broadcast').then(m => ({ default: m.Broadcast })));
 
 /** Skeleton placeholder while admin pages load */
 function AdminSkeleton() {
@@ -113,7 +106,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Suspense fallback={<AdminSkeleton />}><Dashboard /></Suspense>,
+        element: <Suspense fallback={<AdminSkeleton />}><ScheduleMgmt /></Suspense>,
       },
       {
         path: 'schedule',
@@ -126,30 +119,6 @@ export const router = createBrowserRouter([
       {
         path: 'bookings',
         element: <Suspense fallback={<AdminSkeleton />}><AdminBookings /></Suspense>,
-      },
-      {
-        path: 'directions',
-        element: <Suspense fallback={<AdminSkeleton />}><DirectionsCRUD /></Suspense>,
-      },
-      {
-        path: 'teachers',
-        element: <Suspense fallback={<AdminSkeleton />}><TeachersCRUD /></Suspense>,
-      },
-      {
-        path: 'courses',
-        element: <Suspense fallback={<AdminSkeleton />}><CoursesCRUD /></Suspense>,
-      },
-      {
-        path: 'promos',
-        element: <Suspense fallback={<AdminSkeleton />}><PromosCRUD /></Suspense>,
-      },
-      {
-        path: 'subscriptions',
-        element: <Suspense fallback={<AdminSkeleton />}><SubscriptionsCRUD /></Suspense>,
-      },
-      {
-        path: 'broadcast',
-        element: <Suspense fallback={<AdminSkeleton />}><Broadcast /></Suspense>,
       },
     ],
   },
