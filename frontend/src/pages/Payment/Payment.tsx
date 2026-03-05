@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CreditCard, Check, TicketPercent, Loader2 } from 'lucide-react';
-import { usePaymentPlans, useValidatePromo, usePurchase } from '../../api/queries';
+import WebApp from '@twa-dev/sdk';
+import { usePaymentPlans, useValidatePromo, useCreateInvoice } from '../../api/queries';
 import Toast from '../../components/ui/Toast';
 import styles from './Payment.module.css';
 
@@ -23,7 +24,8 @@ export default function Payment() {
   const navigate = useNavigate();
   const { data: plans, isLoading, error } = usePaymentPlans();
   const validatePromo = useValidatePromo();
-  const purchase = usePurchase();
+  const createInvoice = useCreateInvoice();
+  const [isPaying, setIsPaying] = useState(false);
 
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
   const [promoCode, setPromoCode] = useState('');
@@ -76,15 +78,33 @@ export default function Payment() {
 
   const handlePurchase = () => {
     if (!activePlan) return;
-    purchase.mutate(
+    setIsPaying(true);
+
+    createInvoice.mutate(
       { planId: activePlan, promoCode: promoCode.trim() || undefined },
       {
-        onSuccess: () => {
-          setToast({ message: 'Оплата прошла успешно!', type: 'success', visible: true });
-          setTimeout(() => navigate('/profile'), 1500);
+        onSuccess: (invoiceUrl) => {
+          // Открываем платёжную форму Telegram
+          try {
+            WebApp.openInvoice(invoiceUrl, (status) => {
+              setIsPaying(false);
+              if (status === 'paid') {
+                setToast({ message: 'Оплата прошла успешно!', type: 'success', visible: true });
+                setTimeout(() => navigate('/profile'), 1500);
+              } else if (status === 'failed') {
+                setToast({ message: 'Оплата не прошла. Попробуйте ещё раз.', type: 'error', visible: true });
+              }
+              // status === 'cancelled' — пользователь закрыл форму, ничего не показываем
+            });
+          } catch {
+            // Вне Telegram (режим разработки) — openInvoice недоступен
+            setIsPaying(false);
+            setToast({ message: 'Оплата доступна только в Telegram', type: 'error', visible: true });
+          }
         },
         onError: (err) => {
-          setToast({ message: err.message || 'Ошибка оплаты', type: 'error', visible: true });
+          setIsPaying(false);
+          setToast({ message: err.message || 'Ошибка создания платежа', type: 'error', visible: true });
         },
       },
     );
@@ -216,9 +236,9 @@ export default function Payment() {
         <button
           className={styles.payButton}
           onClick={handlePurchase}
-          disabled={!activePlan || purchase.isPending}
+          disabled={!activePlan || isPaying || createInvoice.isPending}
         >
-          {purchase.isPending ? (
+          {(isPaying || createInvoice.isPending) ? (
             <Loader2 size={20} style={{ animation: 'spin 1s linear infinite' }} />
           ) : (
             'Оплатить'

@@ -2,17 +2,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../client';
 import {
   mapSubscriptionPlanWithPrice,
-  mapSubscription,
   type SubscriptionPlanWithPrice,
 } from '../mappers';
 import { queryKeys } from './keys';
-import type { Subscription } from '../../types';
 
 // ---------------------------------------------------------------------------
 // Queries
 // ---------------------------------------------------------------------------
 
-/** Fetch all available subscription plans (includes computed pricePerLesson). */
+/** Получить все доступные тарифные планы (с вычисленной ценой за занятие). */
 export function usePaymentPlans() {
   return useQuery<SubscriptionPlanWithPrice[]>({
     queryKey: queryKeys.payments.plans(),
@@ -27,26 +25,31 @@ export function usePaymentPlans() {
 // Mutations
 // ---------------------------------------------------------------------------
 
-export interface PurchaseParams {
+export interface CreateInvoiceParams {
   planId: number;
   promoCode?: string;
 }
 
-/** Purchase a subscription plan. Invalidates balance and history caches. */
-export function usePurchase() {
+interface InvoiceResponse {
+  invoice_url: string;
+}
+
+/** Создать инвойс Telegram Payments. Возвращает invoice_url для WebApp.openInvoice(). */
+export function useCreateInvoice() {
   const queryClient = useQueryClient();
 
-  return useMutation<Subscription, Error, PurchaseParams>({
+  return useMutation<string, Error, CreateInvoiceParams>({
     mutationFn: async ({ planId, promoCode }) => {
       const body: Record<string, unknown> = { plan_id: planId };
       if (promoCode) body.promo_code = promoCode;
-      const data = await apiClient.post<unknown>(
-        '/api/payments/create',
+      const data = await apiClient.post<InvoiceResponse>(
+        '/api/payments/create-invoice',
         body,
       );
-      return mapSubscription(data);
+      return data.invoice_url;
     },
     onSuccess: () => {
+      // Инвалидируем баланс и историю — обновятся после оплаты
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.balance(),
       });

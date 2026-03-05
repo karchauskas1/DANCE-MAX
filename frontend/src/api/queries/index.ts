@@ -24,8 +24,8 @@ export { useProfile, useBalance, useHistory } from './users';
 export type { BalanceInfo } from './users';
 
 // Payments
-export { usePaymentPlans, usePurchase } from './payments';
-export type { PurchaseParams } from './payments';
+export { usePaymentPlans, useCreateInvoice } from './payments';
+export type { CreateInvoiceParams } from './payments';
 
 // Promos
 export { usePromotions, useValidatePromo } from './promos';

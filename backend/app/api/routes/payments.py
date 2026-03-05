@@ -1,19 +1,23 @@
 """
 Роутер платежей.
 
-Эндпоинты для обработки платежей и покупки абонементов.
-В MVP версии оплата происходит мгновенно (без реального эквайринга):
+Эндпоинты для покупки абонементов через Telegram Payments:
 - Получение списка тарифных планов
-- Создание платежа (мгновенное начисление)
-- Вебхук от платёжной системы (заглушка)
+- Создание инвойса (ссылки для оплаты через Telegram)
+- Резервный create — для ручного зачисления (админ)
 """
 
+import json
 from datetime import date, timedelta
 
+from aiogram.types import LabeledPrice
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.bot import bot
+from app.core.config import settings
 from app.core.dependencies import get_current_user
 from app.database import get_db
 from app.models.promotion import Promotion
@@ -23,6 +27,112 @@ from app.models.user import User
 from app.schemas.subscription import PurchaseRequest, SubscriptionPlanResponse, SubscriptionResponse
 
 router = APIRouter(prefix="/payments", tags=["payments"])
+
+
+class InvoiceRequest(BaseModel):
+    """Запрос на создание инвойса для оплаты."""
+    plan_id: int
+    promo_code: str | None = None
+
+
+class InvoiceResponse(BaseModel):
+    """Ссылка на инвойс для оплаты через Telegram."""
+    invoice_url: str
+
+
+@router.post("/create-invoice", response_model=InvoiceResponse)
+async def create_invoice(
+    body: InvoiceRequest,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> InvoiceResponse:
+    """
+    Создать ссылку на инвойс Telegram Payments.
+
+    Фронтенд вызывает WebApp.openInvoice(url) — Telegram показывает
+    платёжную форму. После оплаты бот получает successful_payment
+    и зачисляет абонемент.
+
+    В payload инвойса передаём plan_id и promo_code, чтобы бот мог
+    зачислить правильный абонемент после подтверждения оплаты.
+    """
+    # Находим тарифный план
+    result = await db.execute(
+        select(SubscriptionPlan).where(
+            SubscriptionPlan.id == body.plan_id,
+            SubscriptionPlan.is_active == True,  # noqa: E712
+        )
+    )
+    plan = result.scalar_one_or_none()
+
+    if plan is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Тарифный план не найден",
+        )
+
+    # Считаем итоговую цену с промокодом
+    final_price = plan.price  # в копейках
+    if body.promo_code:
+        promo_result = await db.execute(
+            select(Promotion).where(
+                Promotion.promo_code == body.promo_code.upper(),
+                Promotion.is_active == True,  # noqa: E712
+                Promotion.valid_from <= date.today(),
+                Promotion.valid_until >= date.today(),
+            )
+        )
+        promo = promo_result.scalar_one_or_none()
+        if promo is not None:
+            can_use = promo.max_uses is None or promo.current_uses < promo.max_uses
+            if can_use:
+                if promo.discount_percent:
+                    final_price -= final_price * promo.discount_percent // 100
+                elif promo.discount_amount:
+                    final_price = max(0, final_price - promo.discount_amount)
+
+    # Минимальная цена для Telegram — 1 рубль (100 копеек)
+    if final_price < 100:
+        final_price = 100
+
+    # Payload для бота: после оплаты бот распарсит и зачислит абонемент
+    payload = json.dumps({
+        "plan_id": plan.id,
+        "promo_code": body.promo_code.strip() if body.promo_code else None,
+    })
+
+    # Данные покупателя для отображения в ЮКассе
+    # Имя + username из Telegram, чтобы администратор видел кто платил
+    buyer_name = user.first_name or ""
+    if user.last_name:
+        buyer_name += f" {user.last_name}"
+    if user.username:
+        buyer_name += f" (@{user.username})"
+
+    # Создаём ссылку на инвойс через Bot API
+    invoice_url = await bot.create_invoice_link(
+        title=f"Абонемент «{plan.name}»",
+        description=(
+            f"{plan.lessons_count} занятий, {plan.validity_days} дней\n"
+            f"Покупатель: {buyer_name}"
+        ),
+        payload=payload,
+        provider_token=settings.PAYMENT_PROVIDER_TOKEN,
+        currency="RUB",
+        prices=[
+            LabeledPrice(
+                label=f"Абонемент «{plan.name}» — {plan.lessons_count} занятий",
+                amount=final_price,
+            ),
+        ],
+        # Запрашиваем номер телефона — будет виден в ЮКассе
+        need_phone_number=True,
+        need_name=True,
+        send_phone_number_to_provider=True,
+        send_email_to_provider=False,
+    )
+
+    return InvoiceResponse(invoice_url=invoice_url)
 
 
 @router.get("/plans", response_model=list[SubscriptionPlanResponse])

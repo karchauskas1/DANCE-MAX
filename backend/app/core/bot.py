@@ -32,8 +32,10 @@ def setup_dispatcher() -> None:
     Вызывается один раз при старте приложения (в lifespan FastAPI).
     Импорт роутеров внутри функции — для избежания циклических зависимостей.
     """
-    from bot.handlers import start, balance, schedule, help as help_handler
+    from bot.handlers import start, balance, schedule, help as help_handler, payments
 
+    # Платежи регистрируем первыми — pre_checkout_query должен обрабатываться быстро
+    dp.include_router(payments.router)
     dp.include_router(start.router)
     dp.include_router(balance.router)
     dp.include_router(schedule.router)
