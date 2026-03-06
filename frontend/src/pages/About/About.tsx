@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Instagram, Clock, Heart, Navigation } from 'lucide-react';
+import { MapPin, Phone, Clock, Heart, Navigation, Send } from 'lucide-react';
 import styles from './About.module.css';
 
 const containerVariants = {
@@ -16,16 +16,19 @@ const itemVariants = {
 };
 
 const studioInfo = {
-  name: 'Dance MAX',
+  name: 'Dance Max',
   description:
-    'Dance MAX -- это современная танцевальная студия в центре города. Мы предлагаем занятия по самым популярным направлениям для любого уровня подготовки. Наша миссия -- сделать танцы доступными и вдохновить каждого на движение.',
-  address: 'г. Москва, ул. Большая Дмитровка, д. 7/5, стр. 1',
-  phone: '+7 (999) 123-45-67',
-  instagram: '@dancemax_studio',
+    'Dance Max — это современная танцевальная студия в центре города. Здесь учат танцевать в самых популярных социальных направлениях — для любого уровня подготовки. Танец — это язык. И наша миссия — научить говорить на нём уверенно.',
+  addresses: [
+    { label: 'Основной филиал', address: 'ул. Рубинштейна, 1/43' },
+    { label: 'Второй филиал', address: 'ул. Политехническая, 17/2' },
+  ],
+  phone: '+7 (995) 230-04-23',
+  telegram: '@dancemaxhelp',
   workingHours: [
-    { days: 'Пн - Пт', hours: '9:00 - 22:00' },
-    { days: 'Сб', hours: '10:00 - 20:00' },
-    { days: 'Вс', hours: '10:00 - 18:00' },
+    { days: 'Пн — Пт', hours: '12:00 — 23:00' },
+    { days: 'Сб', hours: '10:00 — 23:00' },
+    { days: 'Вс', hours: '10:00 — 20:00' },
   ],
 };
 
@@ -49,24 +52,21 @@ export default function About() {
         <p className={styles.description}>{studioInfo.description}</p>
       </motion.section>
 
-      {/* Address & Map */}
+      {/* Адреса */}
       <motion.section className={styles.section} variants={itemVariants}>
         <h2 className={styles.sectionTitle}>
           <MapPin size={18} className={styles.sectionIcon} />
-          Как добраться
+          Наши филиалы
         </h2>
-        <p className={styles.infoText}>{studioInfo.address}</p>
-        <div className={styles.mapWrapper}>
-          <iframe
-            className={styles.mapIframe}
-            src="https://yandex.ru/map-widget/v1/?pt=37.611914,55.762575&z=16&l=map"
-            allowFullScreen
-            title="Dance MAX на карте"
-          />
-        </div>
+        {studioInfo.addresses.map((a) => (
+          <div key={a.label} style={{ marginBottom: 12 }}>
+            <p className={styles.infoText} style={{ fontWeight: 600, marginBottom: 2 }}>{a.label}</p>
+            <p className={styles.infoText}>{a.address}</p>
+          </div>
+        ))}
         <a
           className={styles.directionsButton}
-          href="https://yandex.ru/maps/?rtext=~55.762575,37.611914&rtt=auto"
+          href="https://yandex.ru/maps/?text=Рубинштейна+1/43+Санкт-Петербург"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -75,18 +75,18 @@ export default function About() {
         </a>
       </motion.section>
 
-      {/* Contacts */}
+      {/* Контакты */}
       <motion.section className={styles.section} variants={itemVariants}>
         <h2 className={styles.sectionTitle}>Контакты</h2>
         <div className={styles.contactList}>
-          <div className={styles.contactRow}>
+          <a className={styles.contactRow} href={`tel:${studioInfo.phone.replace(/[() -]/g, '')}`}>
             <Phone size={18} className={styles.contactIcon} />
             <span className={styles.contactValue}>{studioInfo.phone}</span>
-          </div>
-          <div className={styles.contactRow}>
-            <Instagram size={18} className={styles.contactIcon} />
-            <span className={styles.contactValue}>{studioInfo.instagram}</span>
-          </div>
+          </a>
+          <a className={styles.contactRow} href={`https://t.me/${studioInfo.telegram.replace('@', '')}`} target="_blank" rel="noopener noreferrer">
+            <Send size={18} className={styles.contactIcon} />
+            <span className={styles.contactValue}>Telegram: {studioInfo.telegram}</span>
+          </a>
         </div>
       </motion.section>
 

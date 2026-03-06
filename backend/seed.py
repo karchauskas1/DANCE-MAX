@@ -122,32 +122,107 @@ TEACHERS = [
 ]
 
 SUBSCRIPTION_PLANS = [
+    # ── Индивидуальные абонементы ──
     {
-        "name": "Пробное",
+        "name": "Разовое занятие",
         "lessons_count": 1,
-        "validity_days": 14,
-        "price": 50000,  # 500 ₽
-        "description": "Одно занятие на пробу — познакомься со студией и преподавателем",
+        "validity_days": 30,
+        "price": 90000,  # 900 ₽
+        "description": "1 час. Приходите на пробную тренировку",
         "is_popular": False,
         "sort_order": 1,
     },
     {
-        "name": "Стандарт",
-        "lessons_count": 8,
+        "name": "4 часа",
+        "lessons_count": 4,
         "validity_days": 30,
-        "price": 490000,  # 4 900 ₽
-        "description": "8 занятий в месяц — оптимальный вариант для регулярных тренировок",
-        "is_popular": True,
+        "price": 300000,  # 3 000 ₽
+        "description": "Спокойный ритм занятий",
+        "is_popular": False,
         "sort_order": 2,
     },
     {
-        "name": "Безлимит",
-        "lessons_count": 99,
+        "name": "8 часов",
+        "lessons_count": 8,
         "validity_days": 30,
-        "price": 990000,  # 9 900 ₽
-        "description": "Безлимитное посещение всех направлений — танцуй каждый день",
-        "is_popular": False,
+        "price": 520000,  # 5 200 ₽
+        "description": "Подойдёт для регулярной практики",
+        "is_popular": True,
         "sort_order": 3,
+    },
+    {
+        "name": "12 часов",
+        "lessons_count": 12,
+        "validity_days": 30,
+        "price": 720000,  # 7 200 ₽
+        "description": "Комплексная система тренировок",
+        "is_popular": False,
+        "sort_order": 4,
+    },
+    {
+        "name": "16 часов",
+        "lessons_count": 16,
+        "validity_days": 30,
+        "price": 880000,  # 8 800 ₽
+        "description": "Эффективная программа для достижения результатов",
+        "is_popular": False,
+        "sort_order": 5,
+    },
+    # ── Парные абонементы ──
+    {
+        "name": "Парное разовое",
+        "lessons_count": 1,
+        "validity_days": 30,
+        "price": 160000,  # 1 600 ₽
+        "description": "1 час. Приходите на пробную тренировку с парой",
+        "is_popular": False,
+        "sort_order": 6,
+    },
+    {
+        "name": "Парный 4 часа",
+        "lessons_count": 4,
+        "validity_days": 30,
+        "price": 520000,  # 5 200 ₽
+        "description": "Спокойный ритм занятий — для двоих",
+        "is_popular": False,
+        "sort_order": 7,
+    },
+    {
+        "name": "Парный 8 часов",
+        "lessons_count": 8,
+        "validity_days": 30,
+        "price": 920000,  # 9 200 ₽
+        "description": "Подойдёт для регулярной практики — для двоих",
+        "is_popular": False,
+        "sort_order": 8,
+    },
+    {
+        "name": "Парный 16 часов",
+        "lessons_count": 16,
+        "validity_days": 30,
+        "price": 1650000,  # 16 500 ₽
+        "description": "Эффективная программа — для двоих",
+        "is_popular": False,
+        "sort_order": 9,
+    },
+    # ── Безлимитные абонементы ──
+    {
+        "name": "Безлимит 1 месяц",
+        "lessons_count": 999,
+        "validity_days": 30,
+        "price": 1180000,  # 11 800 ₽
+        "description": "Тренируйтесь без ограничений в удобное время",
+        "is_popular": False,
+        "sort_order": 10,
+    },
+    {
+        "name": "Безлимит 3 месяца",
+        "lessons_count": 999,
+        "validity_days": 90,
+        "price": 3000000,  # 30 000 ₽
+        "description": "Полное погружение и стабильный прогресс",
+        "is_popular": False,
+        "sort_order": 11,
     },
 ]
 
