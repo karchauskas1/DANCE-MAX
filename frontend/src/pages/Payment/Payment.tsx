@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Check, Loader2 } from 'lucide-react';
-import WebApp from '@twa-dev/sdk';
 import { usePaymentPlans, useCreateInvoice } from '../../api/queries';
 import Toast from '../../components/ui/Toast';
 import styles from './Payment.module.css';
@@ -45,15 +44,8 @@ export default function Payment() {
       { planId: activePlan },
       {
         onSuccess: (paymentUrl) => {
-          // Открываем страницу оплаты ЮКассы
-          try {
-            WebApp.openLink(paymentUrl);
-          } catch {
-            // Вне Telegram — открываем в новой вкладке
-            window.open(paymentUrl, '_blank');
-          }
-          setIsPaying(false);
-          setToast({ message: 'Перенаправляем на страницу оплаты...', type: 'info', visible: true });
+          // Мгновенный редирект на страницу оплаты ЮКассы
+          window.location.href = paymentUrl;
         },
         onError: (err) => {
           setIsPaying(false);
