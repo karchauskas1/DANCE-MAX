@@ -8,7 +8,6 @@
 - Резервный create — для ручного зачисления (админ)
 """
 
-import json
 import logging
 import uuid
 from datetime import date, timedelta
@@ -22,7 +21,6 @@ from yookassa import Configuration, Payment
 from app.core.config import settings
 from app.core.dependencies import get_current_user
 from app.database import get_db, async_session
-from app.models.promotion import Promotion
 from app.models.subscription import Subscription, SubscriptionPlan
 from app.models.transaction import Transaction
 from app.models.user import User
@@ -32,15 +30,15 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
-# Инициализация ЮКассы
-Configuration.account_id = settings.YOOKASSA_SHOP_ID
-Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
+def _init_yookassa() -> None:
+    """Инициализируем ЮКассу перед каждым вызовом — на Vercel env может подгружаться позже."""
+    Configuration.account_id = settings.YOOKASSA_SHOP_ID
+    Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
 
 class CreatePaymentRequest(BaseModel):
     """Запрос на создание платежа через ЮКассу."""
     plan_id: int
-    promo_code: str | None = None
 
 
 class CreatePaymentResponse(BaseModel):
@@ -61,6 +59,8 @@ async def create_invoice(
     Возвращает URL для редиректа на страницу оплаты ЮКассы.
     После оплаты ЮКасса шлёт webhook → зачисляем абонемент.
     """
+    _init_yookassa()
+
     # Находим тарифный план
     result = await db.execute(
         select(SubscriptionPlan).where(
@@ -76,25 +76,7 @@ async def create_invoice(
             detail="Тарифный план не найден",
         )
 
-    # Считаем итоговую цену с промокодом
     final_price = plan.price  # в копейках
-    if body.promo_code:
-        promo_result = await db.execute(
-            select(Promotion).where(
-                Promotion.promo_code == body.promo_code.upper(),
-                Promotion.is_active == True,  # noqa: E712
-                Promotion.valid_from <= date.today(),
-                Promotion.valid_until >= date.today(),
-            )
-        )
-        promo = promo_result.scalar_one_or_none()
-        if promo is not None:
-            can_use = promo.max_uses is None or promo.current_uses < promo.max_uses
-            if can_use:
-                if promo.discount_percent:
-                    final_price -= final_price * promo.discount_percent // 100
-                elif promo.discount_amount:
-                    final_price = max(0, final_price - promo.discount_amount)
 
     # Минимальная сумма ЮКассы — 1 рубль
     if final_price < 100:
@@ -115,7 +97,6 @@ async def create_invoice(
         "user_id": user.id,
         "telegram_id": user.telegram_id,
         "plan_id": plan.id,
-        "promo_code": body.promo_code.strip() if body.promo_code else None,
         "buyer_name": buyer_name,
     }
 
@@ -169,7 +150,6 @@ async def payment_webhook(request: Request) -> dict:
 
     user_id = metadata.get("user_id")
     plan_id = metadata.get("plan_id")
-    promo_code = metadata.get("promo_code")
 
     if not user_id or not plan_id:
         logger.error("Webhook без user_id/plan_id: payment=%s", payment_id)
@@ -199,23 +179,6 @@ async def payment_webhook(request: Request) -> dict:
             logger.error("План id=%s не найден", plan_id)
             return {"status": "error"}
 
-        # Обрабатываем промокод
-        promo_description = ""
-        if promo_code:
-            promo_result = await db.execute(
-                select(Promotion).where(
-                    Promotion.promo_code == promo_code.upper(),
-                    Promotion.is_active == True,  # noqa: E712
-                )
-            )
-            promo = promo_result.scalar_one_or_none()
-            if promo is not None:
-                if promo.discount_percent:
-                    promo_description = f" (скидка {promo.discount_percent}%)"
-                elif promo.discount_amount:
-                    promo_description = f" (скидка {promo.discount_amount // 100} руб.)"
-                promo.current_uses += 1
-
         # Создаём подписку
         today = date.today()
         subscription = Subscription(
@@ -238,7 +201,7 @@ async def payment_webhook(request: Request) -> dict:
             amount=plan.lessons_count,
             description=(
                 f'Покупка абонемента "{plan.name}" '
-                f'({plan.lessons_count} занятий){promo_description}'
+                f'({plan.lessons_count} занятий)'
             ),
         )
         db.add(transaction)

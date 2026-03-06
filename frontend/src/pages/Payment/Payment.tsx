@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Check, TicketPercent, Loader2 } from 'lucide-react';
+import { CreditCard, Check, Loader2 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
-import { usePaymentPlans, useValidatePromo, useCreateInvoice } from '../../api/queries';
+import { usePaymentPlans, useCreateInvoice } from '../../api/queries';
 import Toast from '../../components/ui/Toast';
 import styles from './Payment.module.css';
 
@@ -21,13 +21,10 @@ const itemVariants = {
 
 export default function Payment() {
   const { data: plans, isLoading, error } = usePaymentPlans();
-  const validatePromo = useValidatePromo();
   const createInvoice = useCreateInvoice();
   const [isPaying, setIsPaying] = useState(false);
 
   const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoDiscount, setPromoDiscount] = useState<{ percent?: number; amount?: number } | null>(null);
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info'; visible: boolean }>({
     message: '',
@@ -35,55 +32,20 @@ export default function Payment() {
     visible: false,
   });
 
-  // Auto-select the popular plan once data loads
+  // Автовыбор популярного тарифа
   const activePlan = selectedPlan ?? plans?.find((p) => p.isPopular)?.id ?? plans?.[0]?.id ?? null;
   const plan = plans?.find((p) => p.id === activePlan);
-
-  // Compute total price in kopecks, applying discount
-  let totalKopecks = plan?.price ?? 0;
-  if (promoDiscount) {
-    if (promoDiscount.percent) {
-      totalKopecks = Math.round(totalKopecks * (1 - promoDiscount.percent / 100));
-    } else if (promoDiscount.amount) {
-      totalKopecks = Math.max(0, totalKopecks - promoDiscount.amount);
-    }
-  }
-
-  const handleValidatePromo = () => {
-    if (!promoCode.trim() || !activePlan) return;
-    validatePromo.mutate(
-      { code: promoCode.trim(), planId: activePlan },
-      {
-        onSuccess: (res) => {
-          if (res.valid) {
-            setPromoDiscount({
-              percent: res.discountPercent,
-              amount: res.discountAmount,
-            });
-            setToast({ message: 'Промокод применён!', type: 'success', visible: true });
-          } else {
-            setPromoDiscount(null);
-            setToast({ message: 'Промокод недействителен', type: 'error', visible: true });
-          }
-        },
-        onError: (err) => {
-          setPromoDiscount(null);
-          setToast({ message: err.message || 'Ошибка проверки промокода', type: 'error', visible: true });
-        },
-      },
-    );
-  };
+  const totalKopecks = plan?.price ?? 0;
 
   const handlePurchase = () => {
     if (!activePlan) return;
     setIsPaying(true);
 
     createInvoice.mutate(
-      { planId: activePlan, promoCode: promoCode.trim() || undefined },
+      { planId: activePlan },
       {
         onSuccess: (paymentUrl) => {
           // Открываем страницу оплаты ЮКассы
-          // После оплаты пользователь вернётся на /profile
           try {
             WebApp.openLink(paymentUrl);
           } catch {
@@ -149,7 +111,7 @@ export default function Payment() {
         Абонементы
       </motion.h1>
 
-      {/* Plan Cards */}
+      {/* Карточки тарифов */}
       {planList.length === 0 ? (
         <motion.p
           variants={itemVariants}
@@ -168,10 +130,7 @@ export default function Payment() {
             <motion.button
               key={p.id}
               className={`${styles.planCard} ${activePlan === p.id ? styles.planCardSelected : ''}`}
-              onClick={() => {
-                setSelectedPlan(p.id);
-                setPromoDiscount(null);
-              }}
+              onClick={() => setSelectedPlan(p.id)}
               variants={itemVariants}
             >
               {p.isPopular && <span className={styles.popularBadge}>Популярный</span>}
@@ -193,28 +152,7 @@ export default function Payment() {
         </motion.div>
       )}
 
-      {/* Promo Code */}
-      <motion.section className={styles.section} variants={itemVariants}>
-        <div className={styles.promoRow}>
-          <TicketPercent size={18} className={styles.promoIcon} />
-          <input
-            type="text"
-            className={styles.promoInput}
-            placeholder="Промокод"
-            value={promoCode}
-            onChange={(e) => setPromoCode(e.target.value)}
-          />
-          <button
-            className={styles.promoButton}
-            onClick={handleValidatePromo}
-            disabled={validatePromo.isPending}
-          >
-            {validatePromo.isPending ? '...' : 'OK'}
-          </button>
-        </div>
-      </motion.section>
-
-      {/* Total */}
+      {/* Итого */}
       <motion.div className={styles.totalRow} variants={itemVariants}>
         <span className={styles.totalLabel}>Итого</span>
         <span className={styles.totalValue}>
@@ -222,7 +160,7 @@ export default function Payment() {
         </span>
       </motion.div>
 
-      {/* Pay Button */}
+      {/* Кнопка оплаты */}
       <motion.div className={styles.actions} variants={itemVariants}>
         <button
           className={styles.payButton}
