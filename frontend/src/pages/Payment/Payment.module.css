@@ -23,11 +23,13 @@
   gap: var(--space-md);
   margin-bottom: var(--space-2xl);
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   padding-top: 14px;
   padding-bottom: var(--space-sm);
+  /* Блокируем вертикальный свайп внутри карусели */
+  touch-action: pan-x;
   /* Скрываем скроллбар */
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -183,9 +185,10 @@
 
 .actions {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   left: var(--space-xl);
   right: var(--space-xl);
+  z-index: 10;
 }
 
 .payButton {
