@@ -38,7 +38,7 @@ export default function Onboarding() {
   );
 
   function complete() {
-    sessionStorage.setItem('dancemax_onboarded', '1');
+    localStorage.setItem('dancemax_onboarded', '1');
     navigate('/', { replace: true });
   }
 
@@ -135,15 +135,20 @@ function Indicators({ current }: { current: number }) {
 
 function SlideWelcome() {
   return (
-    <div className={styles.safeArea} style={{ paddingTop: 60 }}>
+    <div className={styles.safeArea} style={{ paddingTop: 40 }}>
       <div className={styles.welcomeContent}>
+        <img
+          src="/logo-white.png"
+          alt="Dance Max"
+          className={styles.welcomeLogo}
+        />
         <div className={styles.welcomeHeader}>
           <h1 className={`${styles.title} ${styles.titleLarge}`}>Dance Max</h1>
           <p className={styles.subtitle}>Твоя студия танцев — в кармане</p>
         </div>
         <p className={styles.description}>
-          Запись на занятия, расписание, оплата и абонементы — всё в одном месте.
-          Без скачивания приложений.
+          Запись на занятия, расписание, оплата, абонементы и анонсы — всё в одном
+          месте. Без скачивания приложений.
         </p>
       </div>
     </div>
@@ -160,8 +165,8 @@ function SlideSchedule() {
           <h2 className={styles.title}>Выбирай и записывайся</h2>
           <p className={styles.description}>
             Смотри расписание по дням, выбирай направление — бачата, сальса,
-            кизомба — и записывайся в один тап. Видишь свободные места в реальном
-            времени.
+            уникальные занятия — и записывайся в один тап. Видишь свободные места
+            в реальном времени.
           </p>
         </div>
 
@@ -204,8 +209,9 @@ function SlideSubscriptions() {
         <div className={styles.textSection}>
           <h2 className={styles.title}>Покупай абонемент онлайн</h2>
           <p className={styles.description}>
-            Выбери тариф — от пробного до безлимита. Оплата прямо в Telegram, без
-            переходов на внешние сайты. Баланс занятий всегда под рукой.
+            Выбери тариф — от пробного до безлимита. Оплата прямо в Telegram в
+            любое время, без переходов на внешние сайты. Баланс занятий всегда под
+            рукой.
           </p>
         </div>
 
@@ -234,7 +240,7 @@ const AVATARS = [
   { initials: 'ЕС', variant: 'primary' as const },
 ];
 
-const TAGS = ['Бачата', 'Кизомба', 'Реггетон', 'Lady Style'];
+const TAGS = ['Бачата', 'Реггетон', 'Lady Style'];
 
 function SlideInstructors() {
   return (
@@ -243,7 +249,7 @@ function SlideInstructors() {
         <div className={styles.textSection}>
           <h2 className={styles.title}>Знакомься с командой</h2>
           <p className={styles.description}>
-            Бачата, кизомба, реггетон, lady style — выбери своё направление. У
+            Бачата, реггетон, lady style и уникальные занятия — выбери своё направление. У
             каждого преподавателя — профиль с опытом, стилем и отзывами.
           </p>
         </div>

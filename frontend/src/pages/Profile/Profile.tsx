@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ChevronRight, CalendarCheck, History, CreditCard, Info, Wallet, Shield } from 'lucide-react';
+import { ChevronRight, CalendarCheck, History, CreditCard, Info, Wallet, Shield, Smartphone } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useBalance } from '../../api/queries';
 import Skeleton from '../../components/ui/Skeleton';
@@ -138,6 +138,28 @@ export default function Profile() {
             </motion.div>
           ))}
         </motion.div>
+      </motion.section>
+
+      {/* Добавить на экран */}
+      <motion.section className={styles.section} variants={itemVariants}>
+        <button
+          className={styles.linkItem}
+          style={{ width: '100%', border: 'none', cursor: 'pointer', background: 'transparent' }}
+          onClick={() => {
+            try {
+              const tg = (window as unknown as Record<string, unknown>).Telegram as
+                | { WebApp?: { addToHomeScreen?: () => void } }
+                | undefined;
+              tg?.WebApp?.addToHomeScreen?.();
+            } catch {
+              // Метод недоступен
+            }
+          }}
+        >
+          <Smartphone size={20} className={styles.linkIcon} />
+          <span className={styles.linkLabel}>Добавить на экран</span>
+          <ChevronRight size={18} className={styles.linkArrow} />
+        </button>
       </motion.section>
     </motion.div>
   );
