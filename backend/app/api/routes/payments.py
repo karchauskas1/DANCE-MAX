@@ -32,8 +32,13 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 
 def _init_yookassa() -> None:
     """Инициализируем ЮКассу перед каждым вызовом — на Vercel env может подгружаться позже."""
-    Configuration.account_id = settings.YOOKASSA_SHOP_ID
-    Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
+    import os
+    # Берём напрямую из os.environ если settings пустой
+    shop_id = settings.YOOKASSA_SHOP_ID or os.environ.get("YOOKASSA_SHOP_ID", "")
+    secret_key = settings.YOOKASSA_SECRET_KEY or os.environ.get("YOOKASSA_SECRET_KEY", "")
+    logger.info("YooKassa init: shop_id=%s, key=%s...", shop_id, secret_key[:10] if secret_key else "EMPTY")
+    Configuration.account_id = shop_id
+    Configuration.secret_key = secret_key
 
 
 class CreatePaymentRequest(BaseModel):
