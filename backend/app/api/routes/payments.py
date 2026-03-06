@@ -1,60 +1,65 @@
 """
 Роутер платежей.
 
-Эндпоинты для покупки абонементов через Telegram Payments:
+Оплата абонементов через прямой API ЮКассы:
 - Получение списка тарифных планов
-- Создание инвойса (ссылки для оплаты через Telegram)
+- Создание платежа → редирект на страницу ЮКассы
+- Webhook от ЮКассы → зачисление абонемента
 - Резервный create — для ручного зачисления (админ)
 """
 
 import json
+import logging
+import uuid
 from datetime import date, timedelta
 
-from aiogram.types import LabeledPrice
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from yookassa import Configuration, Payment
 
-from app.core.bot import bot
 from app.core.config import settings
 from app.core.dependencies import get_current_user
-from app.database import get_db
+from app.database import get_db, async_session
 from app.models.promotion import Promotion
 from app.models.subscription import Subscription, SubscriptionPlan
 from app.models.transaction import Transaction
 from app.models.user import User
 from app.schemas.subscription import PurchaseRequest, SubscriptionPlanResponse, SubscriptionResponse
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/payments", tags=["payments"])
 
+# Инициализация ЮКассы
+Configuration.account_id = settings.YOOKASSA_SHOP_ID
+Configuration.secret_key = settings.YOOKASSA_SECRET_KEY
 
-class InvoiceRequest(BaseModel):
-    """Запрос на создание инвойса для оплаты."""
+
+class CreatePaymentRequest(BaseModel):
+    """Запрос на создание платежа через ЮКассу."""
     plan_id: int
     promo_code: str | None = None
 
 
-class InvoiceResponse(BaseModel):
-    """Ссылка на инвойс для оплаты через Telegram."""
-    invoice_url: str
+class CreatePaymentResponse(BaseModel):
+    """Ответ с URL для оплаты."""
+    payment_url: str
+    payment_id: str
 
 
-@router.post("/create-invoice", response_model=InvoiceResponse)
+@router.post("/create-invoice", response_model=CreatePaymentResponse)
 async def create_invoice(
-    body: InvoiceRequest,
+    body: CreatePaymentRequest,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
-) -> InvoiceResponse:
+) -> CreatePaymentResponse:
     """
-    Создать ссылку на инвойс Telegram Payments.
+    Создать платёж через ЮКассу.
 
-    Фронтенд вызывает WebApp.openInvoice(url) — Telegram показывает
-    платёжную форму. После оплаты бот получает successful_payment
-    и зачисляет абонемент.
-
-    В payload инвойса передаём plan_id и promo_code, чтобы бот мог
-    зачислить правильный абонемент после подтверждения оплаты.
+    Возвращает URL для редиректа на страницу оплаты ЮКассы.
+    После оплаты ЮКасса шлёт webhook → зачисляем абонемент.
     """
     # Находим тарифный план
     result = await db.execute(
@@ -91,48 +96,171 @@ async def create_invoice(
                 elif promo.discount_amount:
                     final_price = max(0, final_price - promo.discount_amount)
 
-    # Минимальная цена для Telegram — 1 рубль (100 копеек)
+    # Минимальная сумма ЮКассы — 1 рубль
     if final_price < 100:
         final_price = 100
 
-    # Payload для бота: после оплаты бот распарсит и зачислит абонемент
-    payload = json.dumps({
-        "plan_id": plan.id,
-        "promo_code": body.promo_code.strip() if body.promo_code else None,
-    })
+    # Конвертируем копейки в рубли для ЮКассы (формат "49.00")
+    amount_rub = f"{final_price / 100:.2f}"
 
     # Данные покупателя для отображения в ЮКассе
-    # Имя + username из Telegram, чтобы администратор видел кто платил
     buyer_name = user.first_name or ""
     if user.last_name:
         buyer_name += f" {user.last_name}"
     if user.username:
         buyer_name += f" (@{user.username})"
 
-    # Создаём ссылку на инвойс через Bot API
-    invoice_url = await bot.create_invoice_link(
-        title=f"Абонемент «{plan.name}»",
-        description=(
-            f"{plan.lessons_count} занятий, {plan.validity_days} дней\n"
-            f"Покупатель: {buyer_name}"
-        ),
-        payload=payload,
-        provider_token=settings.PAYMENT_PROVIDER_TOKEN,
-        currency="RUB",
-        prices=[
-            LabeledPrice(
-                label=f"Абонемент «{plan.name}» — {plan.lessons_count} занятий",
-                amount=final_price,
-            ),
-        ],
-        # Запрашиваем номер телефона — будет виден в ЮКассе
-        need_phone_number=True,
-        need_name=True,
-        send_phone_number_to_provider=True,
-        send_email_to_provider=False,
+    # Метаданные — передаём в ЮКассу, получим обратно в webhook
+    metadata = {
+        "user_id": user.id,
+        "telegram_id": user.telegram_id,
+        "plan_id": plan.id,
+        "promo_code": body.promo_code.strip() if body.promo_code else None,
+        "buyer_name": buyer_name,
+    }
+
+    # URL возврата после оплаты — обратно в Mini App
+    return_url = f"{settings.TELEGRAM_WEBAPP_URL}/profile"
+
+    # Создаём платёж через ЮКассу
+    payment = Payment.create({
+        "amount": {
+            "value": amount_rub,
+            "currency": "RUB",
+        },
+        "confirmation": {
+            "type": "redirect",
+            "return_url": return_url,
+        },
+        "capture": True,  # автоматическое подтверждение
+        "description": f"Абонемент «{plan.name}» — {plan.lessons_count} занятий. {buyer_name}",
+        "metadata": metadata,
+    }, uuid.uuid4().hex)
+
+    confirmation_url = payment.confirmation.confirmation_url
+
+    return CreatePaymentResponse(
+        payment_url=confirmation_url,
+        payment_id=payment.id,
     )
 
-    return InvoiceResponse(invoice_url=invoice_url)
+
+@router.post("/webhook")
+async def payment_webhook(request: Request) -> dict:
+    """
+    Webhook от ЮКассы — вызывается при изменении статуса платежа.
+
+    При статусе 'succeeded':
+    1. Находим пользователя по metadata.user_id
+    2. Находим тарифный план по metadata.plan_id
+    3. Создаём подписку, зачисляем занятия, создаём транзакцию
+    4. Обрабатываем промокод
+    """
+    body = await request.json()
+    event_type = body.get("event")
+
+    # Нас интересует только успешная оплата
+    if event_type != "payment.succeeded":
+        return {"status": "ok"}
+
+    payment_obj = body.get("object", {})
+    payment_id = payment_obj.get("id", "unknown")
+    metadata = payment_obj.get("metadata", {})
+
+    user_id = metadata.get("user_id")
+    plan_id = metadata.get("plan_id")
+    promo_code = metadata.get("promo_code")
+
+    if not user_id or not plan_id:
+        logger.error("Webhook без user_id/plan_id: payment=%s", payment_id)
+        return {"status": "error", "message": "missing metadata"}
+
+    logger.info(
+        "ЮКасса webhook: payment=%s, user=%s, plan=%s",
+        payment_id, user_id, plan_id,
+    )
+
+    async with async_session() as db:
+        # Находим пользователя
+        result = await db.execute(
+            select(User).where(User.id == int(user_id))
+        )
+        user = result.scalar_one_or_none()
+        if user is None:
+            logger.error("Пользователь id=%s не найден", user_id)
+            return {"status": "error"}
+
+        # Находим тарифный план
+        result = await db.execute(
+            select(SubscriptionPlan).where(SubscriptionPlan.id == int(plan_id))
+        )
+        plan = result.scalar_one_or_none()
+        if plan is None:
+            logger.error("План id=%s не найден", plan_id)
+            return {"status": "error"}
+
+        # Обрабатываем промокод
+        promo_description = ""
+        if promo_code:
+            promo_result = await db.execute(
+                select(Promotion).where(
+                    Promotion.promo_code == promo_code.upper(),
+                    Promotion.is_active == True,  # noqa: E712
+                )
+            )
+            promo = promo_result.scalar_one_or_none()
+            if promo is not None:
+                if promo.discount_percent:
+                    promo_description = f" (скидка {promo.discount_percent}%)"
+                elif promo.discount_amount:
+                    promo_description = f" (скидка {promo.discount_amount // 100} руб.)"
+                promo.current_uses += 1
+
+        # Создаём подписку
+        today = date.today()
+        subscription = Subscription(
+            user_id=user.id,
+            plan_id=plan.id,
+            lessons_remaining=plan.lessons_count,
+            starts_at=today,
+            expires_at=today + timedelta(days=plan.validity_days),
+            is_active=True,
+        )
+        db.add(subscription)
+
+        # Зачисляем занятия на баланс
+        user.balance += plan.lessons_count
+
+        # Транзакция покупки
+        transaction = Transaction(
+            user_id=user.id,
+            type="purchase",
+            amount=plan.lessons_count,
+            description=(
+                f'Покупка абонемента "{plan.name}" '
+                f'({plan.lessons_count} занятий){promo_description}'
+            ),
+        )
+        db.add(transaction)
+
+        await db.commit()
+
+    # Уведомляем пользователя через Telegram
+    try:
+        from app.core.bot import bot
+        await bot.send_message(
+            chat_id=user.telegram_id,
+            text=(
+                f"<b>Оплата прошла!</b>\n\n"
+                f'Абонемент «{plan.name}» активирован.\n'
+                f"На балансе: <b>{user.balance}</b> занятий.\n\n"
+                f"Открывайте приложение и записывайтесь!"
+            ),
+        )
+    except Exception as exc:
+        logger.warning("Не удалось отправить уведомление: %s", exc)
+
+    return {"status": "ok"}
 
 
 @router.get("/plans", response_model=list[SubscriptionPlanResponse])
@@ -159,7 +287,6 @@ async def get_plans(
             price=p.price,
             description=p.description,
             is_popular=p.is_popular,
-            # Вычисляем цену за одно занятие
             price_per_lesson=p.price // p.lessons_count if p.lessons_count > 0 else 0,
         )
         for p in plans
@@ -172,18 +299,7 @@ async def create_payment(
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> SubscriptionResponse:
-    """
-    Создать платёж и начислить абонемент (MVP — без реального эквайринга).
-
-    Бизнес-логика:
-    1. Находим тарифный план по plan_id
-    2. Проверяем промокод если передан — применяем скидку
-    3. Создаём подписку (Subscription) с начальным количеством занятий
-    4. Начисляем занятия на баланс пользователя
-    5. Создаём транзакцию покупки (purchase)
-    6. Возвращаем данные подписки
-    """
-    # Шаг 1: Находим тарифный план
+    """Ручное зачисление абонемента (для админа, без реальной оплаты)."""
     result = await db.execute(
         select(SubscriptionPlan).where(
             SubscriptionPlan.id == body.plan_id,
@@ -198,36 +314,6 @@ async def create_payment(
             detail="Тарифный план не найден",
         )
 
-    # Шаг 2: Проверяем промокод (если передан)
-    final_price = plan.price
-    promo_description = ""
-    if body.promo_code:
-        promo_result = await db.execute(
-            select(Promotion).where(
-                Promotion.promo_code == body.promo_code.upper(),
-                Promotion.is_active == True,  # noqa: E712
-                Promotion.valid_from <= date.today(),
-                Promotion.valid_until >= date.today(),
-            )
-        )
-        promo = promo_result.scalar_one_or_none()
-
-        if promo is not None:
-            # Проверяем лимит использований
-            if promo.max_uses is not None and promo.current_uses >= promo.max_uses:
-                pass  # Промокод исчерпан — игнорируем
-            else:
-                # Применяем скидку
-                if promo.discount_percent:
-                    discount = final_price * promo.discount_percent // 100
-                    final_price -= discount
-                    promo_description = f" (скидка {promo.discount_percent}%)"
-                elif promo.discount_amount:
-                    final_price = max(0, final_price - promo.discount_amount)
-                    promo_description = f" (скидка {promo.discount_amount // 100} руб.)"
-                promo.current_uses += 1
-
-    # Шаг 3: Создаём подписку
     today = date.today()
     subscription = Subscription(
         user_id=user.id,
@@ -238,20 +324,16 @@ async def create_payment(
         is_active=True,
     )
     db.add(subscription)
-
-    # Шаг 4: Начисляем занятия на баланс
     user.balance += plan.lessons_count
 
-    # Шаг 5: Создаём транзакцию покупки
     transaction = Transaction(
         user_id=user.id,
         type="purchase",
         amount=plan.lessons_count,
-        description=f'Покупка абонемента "{plan.name}" ({plan.lessons_count} занятий){promo_description}',
+        description=f'Покупка абонемента "{plan.name}" ({plan.lessons_count} занятий)',
         subscription_id=subscription.id,
     )
     db.add(transaction)
-
     await db.commit()
 
     return SubscriptionResponse(
@@ -271,12 +353,3 @@ async def create_payment(
         expires_at=subscription.expires_at.isoformat(),
         is_active=subscription.is_active,
     )
-
-
-@router.post("/webhook")
-async def payment_webhook() -> dict:
-    """
-    Вебхук от платёжной системы (заглушка для MVP).
-    В продакшене здесь будет обработка callback от Telegram Payments или другого провайдера.
-    """
-    return {"status": "ok", "message": "Webhook received (MVP stub)"}

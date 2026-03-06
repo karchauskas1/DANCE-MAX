@@ -30,11 +30,12 @@ export interface CreateInvoiceParams {
   promoCode?: string;
 }
 
-interface InvoiceResponse {
-  invoice_url: string;
+interface PaymentResponse {
+  payment_url: string;
+  payment_id: string;
 }
 
-/** Создать инвойс Telegram Payments. Возвращает invoice_url для WebApp.openInvoice(). */
+/** Создать платёж через ЮКассу. Возвращает URL страницы оплаты. */
 export function useCreateInvoice() {
   const queryClient = useQueryClient();
 
@@ -42,14 +43,14 @@ export function useCreateInvoice() {
     mutationFn: async ({ planId, promoCode }) => {
       const body: Record<string, unknown> = { plan_id: planId };
       if (promoCode) body.promo_code = promoCode;
-      const data = await apiClient.post<InvoiceResponse>(
+      const data = await apiClient.post<PaymentResponse>(
         '/api/payments/create-invoice',
         body,
       );
-      return data.invoice_url;
+      return data.payment_url;
     },
     onSuccess: () => {
-      // Инвалидируем баланс и историю — обновятся после оплаты
+      // Инвалидируем баланс и историю — обновятся после оплаты через webhook
       queryClient.invalidateQueries({
         queryKey: queryKeys.users.balance(),
       });

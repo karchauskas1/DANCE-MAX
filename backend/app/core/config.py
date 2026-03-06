@@ -28,8 +28,9 @@ class Settings(BaseSettings):
     # URL бэкенда (для установки webhook Telegram)
     BACKEND_URL: str = "http://localhost:8000"
 
-    # Токен платёжного провайдера для Telegram Payments
-    PAYMENT_PROVIDER_TOKEN: str = ""
+    # ЮКасса — прямая интеграция через API
+    YOOKASSA_SHOP_ID: str = ""
+    YOOKASSA_SECRET_KEY: str = ""
 
     # ID администраторов (через запятую: "308477378,123456789")
     ADMIN_IDS: str = "308477378"

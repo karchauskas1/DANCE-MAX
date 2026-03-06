@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CreditCard, Check, TicketPercent, Loader2 } from 'lucide-react';
 import WebApp from '@twa-dev/sdk';
@@ -21,7 +20,6 @@ const itemVariants = {
 };
 
 export default function Payment() {
-  const navigate = useNavigate();
   const { data: plans, isLoading, error } = usePaymentPlans();
   const validatePromo = useValidatePromo();
   const createInvoice = useCreateInvoice();
@@ -83,24 +81,17 @@ export default function Payment() {
     createInvoice.mutate(
       { planId: activePlan, promoCode: promoCode.trim() || undefined },
       {
-        onSuccess: (invoiceUrl) => {
-          // Открываем платёжную форму Telegram
+        onSuccess: (paymentUrl) => {
+          // Открываем страницу оплаты ЮКассы
+          // После оплаты пользователь вернётся на /profile
           try {
-            WebApp.openInvoice(invoiceUrl, (status) => {
-              setIsPaying(false);
-              if (status === 'paid') {
-                setToast({ message: 'Оплата прошла успешно!', type: 'success', visible: true });
-                setTimeout(() => navigate('/profile'), 1500);
-              } else if (status === 'failed') {
-                setToast({ message: 'Оплата не прошла. Попробуйте ещё раз.', type: 'error', visible: true });
-              }
-              // status === 'cancelled' — пользователь закрыл форму, ничего не показываем
-            });
+            WebApp.openLink(paymentUrl);
           } catch {
-            // Вне Telegram (режим разработки) — openInvoice недоступен
-            setIsPaying(false);
-            setToast({ message: 'Оплата доступна только в Telegram', type: 'error', visible: true });
+            // Вне Telegram — открываем в новой вкладке
+            window.open(paymentUrl, '_blank');
           }
+          setIsPaying(false);
+          setToast({ message: 'Перенаправляем на страницу оплаты...', type: 'info', visible: true });
         },
         onError: (err) => {
           setIsPaying(false);
