@@ -69,9 +69,8 @@ export const useAuth = () => {
         }
 
         if (!initData) {
-          console.warn(
-            '[useAuth] initData отсутствует — используется мок-пользователь',
-          );
+          // Вне Telegram — мок-пользователь для разработки
+          setError('initData пусто — мок-режим (вне Telegram)');
           setAuth(MOCK_USER, MOCK_TOKEN);
           setIsLoading(false);
           return;
@@ -87,8 +86,7 @@ export const useAuth = () => {
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Ошибка авторизации';
-        setError(message);
-        console.error('[useAuth] Ошибка авторизации:', err);
+        setError(`Auth fail: ${message}`);
       } finally {
         setIsLoading(false);
       }

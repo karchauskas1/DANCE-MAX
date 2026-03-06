@@ -13,7 +13,7 @@ const pageVariants = {
 
 export default function AppShell() {
   const location = useLocation();
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading, error: authError } = useAuth();
 
   const hasOnboarded = sessionStorage.getItem('dancemax_onboarded');
 
@@ -35,6 +35,19 @@ export default function AppShell() {
       <div className={styles.glowTop} />
       <div className={styles.glowSide} />
       <Header />
+      {/* Показываем ошибку auth, если есть */}
+      {authError && (
+        <div style={{
+          background: 'rgba(248,113,113,0.15)',
+          color: '#F87171',
+          padding: '8px 16px',
+          fontSize: '11px',
+          fontFamily: 'monospace',
+          wordBreak: 'break-all',
+        }}>
+          AUTH: {authError}
+        </div>
+      )}
       <main className={styles.content}>
         <AnimatePresence mode="wait">
           <motion.div

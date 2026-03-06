@@ -30,10 +30,9 @@ async function request<T>(
 
     if (!response.ok) {
       const errorBody = await response.json().catch(() => null);
-      const message =
-        errorBody?.message ||
-        errorBody?.detail ||
-        `HTTP ${response.status}: ${response.statusText}`;
+      const detail = errorBody?.message || errorBody?.detail || response.statusText;
+      // Подробная ошибка: endpoint + статус + причина
+      const message = `[${response.status}] ${endpoint}: ${detail}`;
       throw new Error(message);
     }
 
