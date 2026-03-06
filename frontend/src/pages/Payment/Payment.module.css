@@ -23,8 +23,10 @@
   gap: var(--space-md);
   margin-bottom: var(--space-2xl);
   overflow-x: auto;
+  overflow-y: visible;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  padding-top: 14px;
   padding-bottom: var(--space-sm);
   /* Скрываем скроллбар */
   scrollbar-width: none;
