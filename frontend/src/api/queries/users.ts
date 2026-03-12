@@ -1,7 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '../client';
 import { mapUser, mapTransaction, mapSubscription } from '../mappers';
 import { queryKeys } from './keys';
+import { useAuthStore } from '../../store/auth';
 import type { User, Transaction, Subscription } from '../../types';
 
 // ---------------------------------------------------------------------------
@@ -41,6 +42,40 @@ export function useBalance() {
         balance: data.balance,
         activeSubscriptions: data.active_subscriptions.map(mapSubscription),
       };
+    },
+  });
+}
+
+export interface SetRealNamePayload {
+  realLastName:  string;
+  realFirstName: string;
+  realPatronymic: string;
+}
+
+/** Установить настоящее ФИО (один раз, без возможности изменения). */
+export function useSetRealName() {
+  const queryClient = useQueryClient();
+  // Явно указываем полный generic <User, Error, SetRealNamePayload>,
+  // иначе TypeScript оставит старый <User, Error, string> и выдаст ошибку типов
+  return useMutation<User, Error, SetRealNamePayload>({
+    mutationFn: async (payload) => {
+      const data = await apiClient.put<unknown>('/api/users/real-name', {
+        real_last_name:  payload.realLastName,
+        real_first_name: payload.realFirstName,
+        real_patronymic: payload.realPatronymic,
+      });
+      return mapUser(data);
+    },
+    onSuccess: (updatedUser) => {
+      // Инвалидируем TanStack Query кэш профиля
+      queryClient.invalidateQueries({ queryKey: queryKeys.users.profile() });
+      // КРИТИЧНО: обновляем Zustand auth store напрямую.
+      // AppShell читает user.realName из Zustand, а не из TanStack Query.
+      // Без этого AppShell зациклится на редиректе /register-name → 409 → loop.
+      // Навигация на '/' происходит в компоненте RegisterName (не здесь),
+      // чтобы хук не был связан с маршрутизацией.
+      const token = useAuthStore.getState().token!;
+      useAuthStore.getState().setAuth(updatedUser, token);
     },
   });
 }

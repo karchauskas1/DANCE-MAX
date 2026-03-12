@@ -13,6 +13,11 @@ const MOCK_USER: User = {
   username: 'test_user',
   phone: undefined,
   photoUrl: undefined,
+  // Заполняем ФИО, чтобы AppShell не редиректил на /register-name в дев-режиме
+  realName:       'Тест Пользователь Тестович',
+  realLastName:   'Тест',
+  realFirstName:  'Пользователь',
+  realPatronymic: 'Тестович',
   balance: 0,
   isAdmin: false,
 };
@@ -29,6 +34,10 @@ function mapUserResponse(u: Record<string, unknown>): User {
     username: (u.username as string) || undefined,
     phone: (u.phone as string) || undefined,
     photoUrl: (u.photo_url as string) || undefined,
+    realName:      (u.real_name       as string | null | undefined) ?? undefined,
+    realLastName:  (u.real_last_name  as string | null | undefined) ?? undefined,
+    realFirstName: (u.real_first_name as string | null | undefined) ?? undefined,
+    realPatronymic:(u.real_patronymic as string | null | undefined) ?? undefined,
     balance: u.balance as number,
     isAdmin: (u.is_admin as boolean) || false,
   };

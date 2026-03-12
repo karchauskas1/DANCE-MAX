@@ -30,6 +30,14 @@ class User(Base):
     # Username в Telegram (может отсутствовать)
     username: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
+    # Настоящее ФИО (заполняется один раз при первой регистрации, изменить нельзя)
+    real_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+
+    # Раздельные части ФИО (паспортные данные, заполняются одновременно с real_name)
+    real_last_name:  Mapped[str | None] = mapped_column(String(100), nullable=True)
+    real_first_name: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    real_patronymic: Mapped[str | None] = mapped_column(String(100), nullable=True)
+
     # Номер телефона (заполняется по желанию пользователя)
     phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
 

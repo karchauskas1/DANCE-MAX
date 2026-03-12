@@ -143,6 +143,14 @@ export interface User {
   username?: string;
   phone?: string;
   photoUrl?: string;
+  /** Настоящее ФИО (заполняется один раз при регистрации) */
+  realName?: string;
+  /** Фамилия (паспортные данные) */
+  realLastName?: string;
+  /** Имя (паспортные данные, отличается от firstName из Telegram-профиля) */
+  realFirstName?: string;
+  /** Отчество (паспортные данные) */
+  realPatronymic?: string;
   /** Баланс — количество оставшихся занятий */
   balance: number;
   isAdmin: boolean;

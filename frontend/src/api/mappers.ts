@@ -113,6 +113,10 @@ export function mapUser(data: any): User {
     username: data.username ?? undefined,
     phone: data.phone ?? undefined,
     photoUrl: data.photo_url ?? undefined,
+    realName:      data.real_name      ?? undefined,
+    realLastName:  data.real_last_name  ?? undefined,
+    realFirstName: data.real_first_name ?? undefined,
+    realPatronymic: data.real_patronymic ?? undefined,
     balance: data.balance ?? 0,
     isAdmin: data.is_admin ?? false,
   };
